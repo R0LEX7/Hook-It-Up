@@ -4,7 +4,7 @@ import {
   getProfile,
   updateProfile,
   updatePassword
-} from "../controllers/user.controller";
+} from "../controllers/profile.controller";
 import { validate } from "../middlewares/validate.middleware";
 
 import { isAuthenticated } from "../middlewares/user.middleware";
@@ -12,9 +12,9 @@ import { updatePasswordSchema, updateProfileSchema } from "../schemas/user.schem
 
 const router: Router = Router();
 
-router.get("/user", isAuthenticated, getProfile);
-router.patch("/update", isAuthenticated, validate(updateProfileSchema), updateProfile);
-router.patch("/update/password", isAuthenticated, validate(updatePasswordSchema), updatePassword);
+router.get("/view", isAuthenticated, getProfile);
+router.patch("/edit", isAuthenticated, validate(updateProfileSchema , "body"), updateProfile);
+router.patch("/password", isAuthenticated, validate(updatePasswordSchema , "body"), updatePassword);
 router.delete("/delete", isAuthenticated, deleteProfile);
 
 export default router;

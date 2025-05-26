@@ -1,29 +1,37 @@
-# User Router
+# User Routes
+| Method | Endpoint            | Description                  |
+| ------ | ------------------- | ---------------------------- |
+| GET    | `/user/connections` | List of user's connections   |
+| GET    | `/user/requests`    | Incoming connection requests |
+| GET    | `/user/feed`        | Suggested profiles (feed)    |
 
-- GET: /user/connections
-- GET: /user/requests
-- GET: /user/feed
+______________________________________________________________________________
 
-_______________________________________________________
+# Auth Routes
+| Method | Endpoint        | Description       |
+| ------ | --------------- | ----------------- |
+| POST   | `/auth/login`   | User login        |
+| POST   | `/auth/sign_up` | User registration |
+| POST   | `/auth/logout`  | Logout user       |
 
-# Auth
-
-- POST: /auth/login
-- POST: /auth/sign_up
-- POST: /auth/logout
-
-_______________________________________________________
+______________________________________________________________________________
 
 # Profile
+| Method | Endpoint            | Description         |
+| ------ | ------------------- | ------------------- |
+| GET    | `/profile/view`     | View user profile   |
+| PATCH  | `/profile/edit`     | Edit profile info   |
+| PATCH  | `/profile/password` | Change password     |
+| DELETE | `/delete`           | Delete user account |
 
-- GET: /profile/view
-- PATCH: /profile/edit
-- PATCH: /profile/password
-_______________________________________________________
+______________________________________________________________________________
 
 # Connection Request
-
-- POST: /request/send/interest/:userId
-- POST: /request/send/ignored/:userId
-- POST: /request/review/accepted/:requestId
-- POST: /request/review/rejected/:requestId
+| Method | Endpoint                             | Description                 |
+| ------ | ------------------------------------ | --------------------------- |
+| POST   | `/connection/send/interest/:userId`  | Express interest in a user  |
+| POST   | `/connection/send/ignored/:userId`   | Ignore a user               |
+| POST   | `/connection/review/accepted/:reqId` | Accept a connection request |
+| POST   | `/connection/review/rejected/:reqId` | Reject a connection request |
+| GET    | `/connection/requests`               | View all pending requests   |
+| GET    | `/connection/all_connections`        | Get all established matches |

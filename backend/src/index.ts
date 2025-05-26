@@ -1,7 +1,7 @@
 import { connectToDatabase } from "./config";
 import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
-import { userRouter , authRouter, connectionRequestRouter } from "./routes";
+import { profileRouter , authRouter, connectionRequestRouter } from "./routes";
 import { z } from "zod";
 dotenv.config();
 
@@ -14,12 +14,12 @@ app.use(express.json());
 
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("hello typescript with nodejs");
+  res.send("hello!!");
 });
 
-app.use("/user", userRouter);
 app.use("/auth", authRouter);
-app.use("/connections", connectionRequestRouter);
+app.use("/profile", profileRouter);
+app.use("/connection", connectionRequestRouter);
 
 app.use((err : Error, req : Request, res : Response, next : NextFunction) => {
   if(err instanceof z.ZodError){

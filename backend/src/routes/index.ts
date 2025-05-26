@@ -1,5 +1,5 @@
-import userRouter from "./user.route";
+import profileRouter from "./profile.route";
 import authRouter from "./auth.route";
 import connectionRequestRouter from "./connectionRequest.route";
 
-export { userRouter, authRouter , connectionRequestRouter };
+export { profileRouter, authRouter , connectionRequestRouter };

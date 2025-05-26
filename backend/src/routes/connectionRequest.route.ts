@@ -1,14 +1,18 @@
 import {Request , Response , Router} from 'express'
-import { sendInterestRequest   ,acceptConnectionRequest , fetchConnectionRequests , fetchConnections ,ignoreConnectionRequest, rejectConnectionRequest} from '../controllers/connectionRequest.controller';
+import { sendConnectionRequest   ,reviewConnectionRequest , fetchConnectionRequests , fetchConnections } from '../controllers/connectionRequest.controller';
 import { isAuthenticated } from '../middlewares/user.middleware';
+import { validate } from '../middlewares/validate.middleware';
+import { requestSchema, reviewSchema } from '../schemas/connectionRequest.schema';
 
 const router : Router = Router()
 
-router.post("/send/interested/:userId" ,isAuthenticated , sendInterestRequest )
-router.post("/send/ignored/:userId" ,isAuthenticated , ignoreConnectionRequest )
-router.post("/review/rejected/:reqId" ,isAuthenticated , rejectConnectionRequest )
-router.post("/review/accepted/:reqId" ,isAuthenticated , acceptConnectionRequest )
-router.get("/all/connections" ,isAuthenticated , fetchConnections )
+/* same api for interested and ignored */
+router.post("/send/:status/:userId" ,isAuthenticated , validate(requestSchema , "params") , sendConnectionRequest )
+
+/* same api for accepted and rejected */
+router.post("/review/:status/:reqId" ,isAuthenticated ,validate(reviewSchema , "params"), reviewConnectionRequest )
+
+router.get("/all_connections" ,isAuthenticated , fetchConnections )
 router.get("/requests" ,isAuthenticated , fetchConnectionRequests )
 
 
