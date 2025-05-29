@@ -1,7 +1,12 @@
 import { connectToDatabase } from "./config";
 import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
-import { profileRouter , authRouter, connectionRequestRouter } from "./routes";
+import {
+  profileRouter,
+  authRouter,
+  connectionRequestRouter,
+  feedRouter,
+} from "./routes";
 import { z } from "zod";
 dotenv.config();
 
@@ -12,18 +17,18 @@ connectToDatabase();
 
 app.use(express.json());
 
-
-app.get("/", (req: Request, res: Response) => {
-  res.send("hello!!");
+app.get("/hello", (req: Request, res: Response) => {
+  res.status(200).json("hello");
 });
 
 app.use("/auth", authRouter);
+app.use("/feed", feedRouter);
 app.use("/profile", profileRouter);
 app.use("/connection", connectionRequestRouter);
 
-app.use((err : Error, req : Request, res : Response, next : NextFunction) => {
-  if(err instanceof z.ZodError){
-    res.status(400).json({error : "Validation Error" , details : err.errors});
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof z.ZodError) {
+    res.status(400).json({ error: "Validation Error", details: err.errors });
     console.log("Error : ", err.errors);
     return;
   }
