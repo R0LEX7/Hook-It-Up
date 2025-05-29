@@ -31,6 +31,9 @@ export const signUp = asyncHandler(async (req: Request, res: Response) => {
 
   const savedUser = await user.save();
 
+
+
+
   res.status(201).json({ user: savedUser, message: "User Saved Successfully" });
 });
 
@@ -49,10 +52,13 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
   if (!isVerifiedUser) return  res.status(401).json({ message: `Invalid Credentials` });
 
-// token creation
+  // token creation
   const token: string = sign({ id: user._id }, jwtSecret);
   console.log("token :" , token);
 
+  const data = await UserModal.collection.getIndexes();
+
+  console.log("index data -> " ,data);
 
   return res.status(200).json({ message: `${user?.username} login Successfully` , token : token });
 });
