@@ -12,8 +12,8 @@ router.post("/send/:status/:userId" ,isAuthenticated , validate(requestSchema , 
 /* same api for accepted and rejected */
 router.post("/review/:status/:reqId" ,isAuthenticated ,validate(reviewSchema , "params"), reviewConnectionRequest )
 
-router.get("/all_connections" ,isAuthenticated , requests )
-router.get("/requests" ,isAuthenticated , connections )
+router.get("/all_connections" ,isAuthenticated , connections )
+router.get("/requests" ,isAuthenticated , requests )
 
 
 export default router;

@@ -1,0 +1,83 @@
+[
+  {
+    "firstName": "Virat",
+    "lastName": "Kohli",
+    "username": "cheeku",
+    "password": "12345678",
+    "age": 34
+  },
+  {
+    "firstName": "Rohit",
+    "lastName": "Sharma",
+    "username": "hitman45",
+    "password": "abcdefghi",
+    "age": 36,
+    "bio": "Cricket is life",
+    "hobbies": ["batting", "travel"]
+  },
+  {
+    "firstName": "MS",
+    "lastName": "Dhoni",
+    "username": "captaincool",
+    "password": "mahi2007",
+    "age": 42,
+    "bio": "Helicopter shot inventor",
+    "hobbies": ["biking", "keeping"]
+  },
+  {
+    "firstName": "Hardik",
+    "lastName": "Pandya",
+    "username": "hp33",
+    "password": "allrounder8",
+    "age": 30,
+    "hobbies": ["gym", "fashion"]
+  },
+  {
+    "firstName": "Jasprit",
+    "lastName": "Bumrah",
+    "username": "boomboom",
+    "password": "fastbowl99",
+    "age": 29
+  },
+  {
+    "firstName": "Rishabh",
+    "lastName": "Pant",
+    "username": "rp17",
+    "password": "delhirocker",
+    "age": 27,
+    "bio": "Wicket keeper batsman"
+  },
+  {
+    "firstName": "Shubman",
+    "lastName": "Gill",
+    "username": "princegill",
+    "password": "younggun12",
+    "age": 25,
+    "hobbies": ["reading", "fielding"]
+  },
+  {
+    "firstName": "Suryakumar",
+    "lastName": "Yadav",
+    "username": "sky360",
+    "password": "skydominator",
+    "age": 33,
+    "bio": "360 degree player"
+  },
+  {
+    "firstName": "KL",
+    "lastName": "Rahul",
+    "username": "rahulkl",
+    "password": "opener789",
+    "age": 32,
+    "hobbies": ["fitness", "music"]
+  },
+  {
+    "firstName": "Yuzvendra",
+    "lastName": "Chahal",
+    "username": "chahal23",
+    "password": "spinwizard",
+    "age": 31,
+    "bio": "Chess and spin bowler",
+    "hobbies": ["chess", "pranks"]
+  }
+]
