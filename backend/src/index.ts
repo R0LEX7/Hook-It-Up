@@ -36,6 +36,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: "Something went wrong!!" });
 });
 
-app.listen(PORT, () => {
-  console.log(`server connected to http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log("Server listening on port " , PORT);
 });
