@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 const PORT: number = Number(process.env.PORT) || 3000;
 
-connectToDatabase();
+// connectToDatabase();
 
 app.use(express.json());
 
@@ -36,6 +36,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: "Something went wrong!!" });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   console.log("Server listening on port " , PORT);
 });
