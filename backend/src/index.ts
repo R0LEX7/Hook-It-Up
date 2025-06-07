@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 const PORT: number = Number(process.env.PORT) || 3000;
 
-// connectToDatabase();
+connectToDatabase();
 
 app.use(express.json());
 
