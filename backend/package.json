@@ -12,16 +12,19 @@
   "author": "Himanshu",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.826.0",
     "@types/express": "^5.0.0",
     "argon2": "^0.41.1",
-    "aws-sdk": "^2.1692.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.11.0",
+    "razorpay": "^2.9.6",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.5",
     "ts-node": "^10.9.2",

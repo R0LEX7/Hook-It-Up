@@ -1,19 +1,28 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { connectToDatabase } from "./config";
 import express, { NextFunction, Request, Response } from "express";
-import dotenv from "dotenv";
 import {
   profileRouter,
   authRouter,
   connectionRequestRouter,
   feedRouter,
+  paymentRouter,
 } from "./routes";
+import cors from 'cors'
 import { z } from "zod";
-dotenv.config();
 
 const app = express();
 const PORT: number = Number(process.env.PORT) || 3000;
 
 connectToDatabase();
+
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
@@ -24,6 +33,7 @@ app.get("/hello", (req: Request, res: Response) => {
 app.use("/auth", authRouter);
 app.use("/feed", feedRouter);
 app.use("/profile", profileRouter);
+app.use("/payment", paymentRouter);
 app.use("/connection", connectionRequestRouter);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -9,6 +9,7 @@ import {
 } from "../constants/status.constant";
 import { IConnectionRequest } from "../Interfaces/connectionRequest.interfaces";
 import { UserModal } from "../models/user.model";
+import { run } from "../services/email.service";
 
 /**
  * Connection Request apis
@@ -118,6 +119,10 @@ export const sendConnectionRequest = asyncHandler<IGetUserAuthInfoRequest>(
       .findById(savedRequest._id)
       .populate("receiverId", USER_POP_CONST)
       .populate("senderId", USER_POP_CONST);
+
+    const emailRes = await run();
+
+    console.log("email response -> ", emailRes);
 
     res.status(201).json({
       success: true,
