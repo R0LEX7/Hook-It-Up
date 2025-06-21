@@ -20,6 +20,7 @@ export const jwtSecret: string = process.env.JWT_KEY || "abc";
 export const signUp = asyncHandler(async (req: Request, res: Response) => {
   const { firstName, lastName, username, password  , age} = req.body;
 
+
   const hashedPassword: string = await hash(password);
   const user = new UserModal({
     firstName,
