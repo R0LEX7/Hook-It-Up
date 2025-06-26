@@ -1,9 +1,10 @@
-import { PRIMARY } from '@/constants/myColor';
+import InputField from '@/components/Input';
+import { BASE_URI } from '@/constants/api';
+import { PRIMARY, SECONDARY } from '@/constants/myColor';
 import { storeData } from '@/libs/asyncStorage.libs';
 import { withErrorHandler } from '@/libs/errorHandler.libs';
 import { getToast } from '@/libs/Toast.libs';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { loginSchema } from '@/schemas/auth.schema';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -14,8 +15,7 @@ import {
   KeyboardAvoidingView,
   Pressable,
   Text,
-  TextInput,
-  View
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -26,28 +26,56 @@ const Login: React.FC = () => {
     username: '',
     password: '',
   });
+  const [formErrors, setFormErrors] = useState({
+    username: '',
+    password: '',
+  });
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-const handleLogin = async () => {
-  setIsLoading(true);
-  try {
-    await withErrorHandler(async () => {
-      const res = await axios.post('http://192.168.1.4:3000/auth/login', credentials);
-      const token = res.data.token;
-      console.log(token);
-      if (token) {
+  const handleLogin = async () => {
+    setIsLoading(true);
+
+    /* form validation*/
+    const validation = loginSchema.safeParse(credentials);
+
+    if (!validation.success) {
+      const fieldErrors = validation.error.flatten().fieldErrors;
+      setFormErrors({
+        username: fieldErrors.username?.[0] || '',
+        password: fieldErrors.password?.[0] || '',
+      });
+
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const res: any = await withErrorHandler(async () => {
+        return await axios.post(BASE_URI + 'auth/login', credentials);
+      })();
+
+      console.log("res " , res);
+
+
+      if (res?.status === 200 && res.data?.token) {
+        const token = res.data.token;
         await storeData('user_token', token);
-        getToast( "success" , "Login SuccessFull " , credentials.username)
+        getToast(
+          'success',
+          'Login Successful',
+          `${credentials.username} welcome to HookItUp`,
+        );
+        router.replace("/(tabs)/explore")
+      } else {
+        const errorMsg =
+          res?.message || 'Login failed. Please try again.';
+        getToast('error', 'Login Failed', errorMsg);
       }
-
-    })();
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView
@@ -114,75 +142,39 @@ const handleLogin = async () => {
         </View>
 
         <View style={{ marginTop: 20 }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 5,
-              backgroundColor: PRIMARY,
-              paddingVertical: 5,
-              borderRadius: 5,
-              marginTop: 30,
-            }}
-          >
-            <MaterialIcons
-              style={{ marginLeft: 8 }}
-              name="email"
-              size={24}
-              color="white"
-            />
-
-            <TextInput
-              placeholder="Enter your username"
-              placeholderTextColor={'white'}
+          <View className='mt-2'>
+            <InputField
+              placeholder="Enter your Username*"
+              placeholderTextColor={SECONDARY}
               value={credentials.username}
-              onChangeText={(text) =>
+              onChangeText={(text: string) =>
                 setCredentials({ ...credentials, username: text })
               }
-              style={{
-                color: 'white',
-                marginVertical: 10,
-                width: 300,
-                fontSize: 17,
-              }}
             />
+            {formErrors.username && (
+              <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
+                {formErrors.username}
+              </Text>
+            )}
           </View>
         </View>
 
         <View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 5,
-              backgroundColor: PRIMARY,
-              paddingVertical: 5,
-              borderRadius: 5,
-              marginTop: 30,
-            }}
-          >
-            <AntDesign
-              style={{ marginLeft: 8 }}
-              name="lock1"
-              size={24}
-              color="white"
-            />
-
-            <TextInput
-              placeholder="Enter your password"
+          <View className='mt-2'>
+            <InputField
+              placeholder="Enter your Password*"
+              placeholderTextColor={SECONDARY}
               secureTextEntry={true}
-              placeholderTextColor={'white'}
               value={credentials.password}
-              onChangeText={(text) =>
+              onChangeText={(text: string) =>
                 setCredentials({ ...credentials, password: text })
               }
-              style={{
-                color: 'white',
-                marginVertical: 10,
-                width: 300,
-                fontSize: 17,
-              }}
             />
+            {formErrors.password && (
+              <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
+                {formErrors.password}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -202,7 +194,7 @@ const handleLogin = async () => {
         </View>
 
         <View style={{ marginTop: 50 }}>
-          {isLoading && <ActivityIndicator size={"large"}/>}
+          {isLoading && <ActivityIndicator size={'large'} />}
           <Pressable
             onPress={handleLogin}
             disabled={isLoading}
@@ -232,7 +224,8 @@ const handleLogin = async () => {
             style={{ marginTop: 12 }}
           >
             <Text style={{ textAlign: 'center', color: 'gray', fontSize: 16 }}>
-              Don&apos;t have an account? Sign Up
+              Don&apos;t have an account?{' '}
+              <Text style={{ color: PRIMARY }}>Sign Up</Text>
             </Text>
           </Pressable>
         </View>

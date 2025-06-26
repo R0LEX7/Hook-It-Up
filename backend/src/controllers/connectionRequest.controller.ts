@@ -10,6 +10,7 @@ import {
 import { IConnectionRequest } from "../Interfaces/connectionRequest.interfaces";
 import { UserModal } from "../models/user.model";
 import { run } from "../services/email.service";
+import { Types } from "mongoose";
 
 /**
  * Connection Request apis
@@ -25,6 +26,10 @@ import { run } from "../services/email.service";
 const reqStatus = "interested";
 const conStatus = "accepted";
 
+function isPopulatedUser(user: Types.ObjectId | IUser): user is IUser {
+  return typeof user === "object" && "username" in user;
+}
+
 export const requests = asyncHandler<IGetUserAuthInfoRequest>(
   async (req, res: Response) => {
     const user = req.user;
@@ -32,16 +37,35 @@ export const requests = asyncHandler<IGetUserAuthInfoRequest>(
     const allRequests = await connectionRequestModel
       .find({
         status: reqStatus,
-        $or: [{ senderId: user._id }, { receiverId: user._id }],
+         receiverId: user._id,
       })
       .populate("senderId", USER_POP_CONST)
       .populate("receiverId", USER_POP_CONST);
+
+    const requests = allRequests
+      .map((request) => {
+        const sender = request.senderId;
+        const receiver = request.receiverId;
+        const reqId = request._id;
+
+        if (isPopulatedUser(sender) && isPopulatedUser(receiver)) {
+          if (sender._id.equals(user._id)) {
+            return { ...receiver.toObject(), reqId };
+          } else {
+            return { ...sender.toObject(), reqId };
+          }
+        }
+
+        return null; // fallback, should never hit if populate works
+      })
+      .filter(Boolean); // remove nulls
 
     res.status(200).json({
       success: true,
       message: "Connections fetched",
       count: allRequests.length,
       allRequests,
+      requests,
     });
   }
 );
@@ -56,14 +80,29 @@ export const connections = asyncHandler<IGetUserAuthInfoRequest>(
         status: conStatus,
         $or: [{ senderId: user._id }, { receiverId: user._id }],
       })
-      .populate("senderId", "username firstName lastName age")
-      .populate("receiverId", "username firstName lastName age");
+      .populate("senderId", USER_POP_CONST)
+      .populate("receiverId", USER_POP_CONST);
 
+    const matchesSet = new Set();
+
+    allAcceptedConnections.forEach((connection) => {
+      const sender = connection.senderId;
+      const receiver = connection.receiverId;
+
+      if (sender._id.equals(user._id)) {
+        matchesSet.add(receiver);
+      } else if (receiver._id.equals(user._id)) {
+        matchesSet.add(sender);
+      }
+    });
+
+    const matches = new Array(...matchesSet);
     res.status(200).json({
       success: true,
       message: "Connections fetched",
       count: allAcceptedConnections.length,
       allAcceptedConnections,
+      matches: matches,
     });
   }
 );
@@ -120,9 +159,9 @@ export const sendConnectionRequest = asyncHandler<IGetUserAuthInfoRequest>(
       .populate("receiverId", USER_POP_CONST)
       .populate("senderId", USER_POP_CONST);
 
-    const emailRes = await run();
+    // const emailRes = await run();
 
-    console.log("email response -> ", emailRes);
+    // console.log("email response -> ", emailRes);
 
     res.status(201).json({
       success: true,

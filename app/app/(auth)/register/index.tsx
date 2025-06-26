@@ -1,8 +1,12 @@
 import InputField from '@/components/Input';
+import { BASE_URI } from '@/constants/api';
 import { PRIMARY, SECONDARY } from '@/constants/myColor';
 import { withErrorHandler } from '@/libs/errorHandler.libs';
+import { getToast } from '@/libs/Toast.libs';
+import { registerSchema } from '@/schemas/auth.schema';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import {
@@ -14,6 +18,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+ interface IRegisterUser {
+  username: string;
+  lastName: string;
+  firstName: string;
+  age:  number;
+  password: string;
+  hobbies ?:string[],
+  profilePic ?: string
+}
+
 const Register: React.FC = () => {
   const router = useRouter();
 
@@ -21,7 +35,7 @@ const Register: React.FC = () => {
     username: '',
     lastName: '',
     firstName: '',
-    age: 0,
+    age: '',
     password: '',
   });
 
@@ -35,27 +49,53 @@ const Register: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-const handleRegister = async () => {
-  setIsLoading(true);
+  const handleRegister = async () => {
+    setIsLoading(true);
 
-  try {
-    await withErrorHandler(async () => {
-      const res = await axios.post('http://192.168.1.4:3000/auth/signup', credentials);
+    console.log('click');
 
-      console.log('Signup response:', res);
-      if (res.status === 201 || res.data?.success) {
+    const userCredentials : IRegisterUser = { ...credentials, age: Number(credentials.age) };
 
+    /* form validation*/
+    const validation = registerSchema.safeParse(userCredentials);
+
+    if (!validation.success) {
+      console.log('Validation failed:', validation?.error.flatten());
+      const fieldErrors = validation.error.flatten().fieldErrors;
+      setFormErrors({
+        firstName: fieldErrors.firstName?.[0] || '',
+        lastName: fieldErrors.lastName?.[0] || '',
+        username: fieldErrors.username?.[0] || '',
+        age: fieldErrors.age?.[0] || '',
+        password: fieldErrors.password?.[0] || '',
+      });
+
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const res: any = await withErrorHandler(async () => {
+        return await axios.post(BASE_URI + 'auth/signup', userCredentials);
+      })();
+
+      console.log('res ', res);
+
+      if (res?.status === 201) {
+        getToast(
+          'success',
+          'Signup Successful',
+          `${credentials.username} Kindly Login to HookItUp`,
+        );
         router.replace('/(auth)/login');
       } else {
-        console.warn('Signup failed:', res.data?.message || 'Unknown error');
+        const errorMsg = res?.message || 'Register failed. Please try again.';
+        getToast('error', 'Register Failed', errorMsg);
       }
-    })();
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView
@@ -145,14 +185,17 @@ const handleRegister = async () => {
 
         <View>
           <InputField
-            placeholder="Enter your Age*"
+            placeholder="Enter your Age (e.g. 18)*"
             placeholderTextColor={SECONDARY}
             keyboardType="numeric"
-            onChangeText={(text: string) =>
-              setCredentials({ ...credentials, age: Number(text) })
-            }
-            value={String(credentials.age)}
             maxLength={2}
+            value={credentials.age}
+            onChangeText={(text: string) => {
+              // Allow only digits and block everything else
+              if (/^\d{0,2}$/.test(text)) {
+                setCredentials({ ...credentials, age: text });
+              }
+            }}
           />
           {formErrors.age && (
             <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
@@ -165,6 +208,7 @@ const handleRegister = async () => {
           <InputField
             placeholder="Enter your Password*"
             placeholderTextColor={SECONDARY}
+            secureTextEntry={true}
             value={credentials.password}
             onChangeText={(text: string) =>
               setCredentials({ ...credentials, password: text })
@@ -177,12 +221,12 @@ const handleRegister = async () => {
           )}
         </View>
 
-        <View style={{ marginTop: 50 }}>
+        <View style={{ marginTop: 25  }}>
           <Pressable
             onPress={handleRegister}
-            disabled={isLoading}
+            // disabled={isLoading}
             style={{
-              width: 200,
+              width : 300,
               backgroundColor: PRIMARY,
               borderRadius: 6,
               marginLeft: 'auto',
@@ -203,17 +247,16 @@ const handleRegister = async () => {
           </Pressable>
 
           <Pressable onPress={() => router.replace('/(auth)/login')}>
-
             <Text
               style={{
                 textAlign: 'center',
                 color: 'gray',
                 fontSize: 16,
-                marginBlock: 10,
+                marginVertical: 10,
               }}
             >
-              Already have an account?{' '}
-              <Text style={{ color: PRIMARY }}>Log in?</Text>
+              Already have an account?
+              <Text style={{ color: PRIMARY , marginHorizontal: 8}}>Log in?</Text>
             </Text>
           </Pressable>
         </View>

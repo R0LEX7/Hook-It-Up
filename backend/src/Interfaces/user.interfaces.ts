@@ -18,6 +18,8 @@ export interface IUser extends Document {
     _id: Types.ObjectId ;
     age : number,
     bio?: string;
+    profilePic? : string,
+    gender : string
   hobbies?: string[];
   [key: string]: any; // It’s called an index signature in TypeScript
   // This allows you to add any other properties dynamically

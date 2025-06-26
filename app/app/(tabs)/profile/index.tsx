@@ -1,12 +1,11 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import ProfileScreen from '@/screens/ProfileScreen';
+import { useUserStore } from '@/store/user.store';
+import React from 'react';
 
 const Index = () => {
-  return (
-    <View>
-      <Text>profile</Text>
-    </View>
-  )
-}
+  const { user } = useUserStore();
 
-export default Index
+  return <>{user && <ProfileScreen profile={user} />}</>;
+};
+
+export default Index;

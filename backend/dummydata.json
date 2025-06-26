@@ -1,83 +1,221 @@
 [
   {
-    "firstName": "Virat",
-    "lastName": "Kohli",
-    "username": "cheeku",
-    "password": "12345678",
-    "age": 34
+    "firstName": "Liam",
+    "lastName": "Brown",
+    "profilePic": "https://i.pinimg.com/564x/2e/12/72/2e1272bc4e6783b91c4e3cd9e7467e3e.jpg",
+    "gender": "male",
+    "username": "liam_brown01",
+    "password": "password123",
+    "bio": "Coffee addict & tech nerd.",
+    "age": 28,
+    "hobbies": ["coding", "chess", "running"],
+    "isPremium": false
   },
   {
-    "firstName": "Rohit",
-    "lastName": "Sharma",
-    "username": "hitman45",
-    "password": "abcdefghi",
-    "age": 36,
-    "bio": "Cricket is life",
-    "hobbies": ["batting", "travel"]
-  },
-  {
-    "firstName": "MS",
-    "lastName": "Dhoni",
-    "username": "captaincool",
-    "password": "mahi2007",
-    "age": 42,
-    "bio": "Helicopter shot inventor",
-    "hobbies": ["biking", "keeping"]
-  },
-  {
-    "firstName": "Hardik",
-    "lastName": "Pandya",
-    "username": "hp33",
-    "password": "allrounder8",
-    "age": 30,
-    "hobbies": ["gym", "fashion"]
-  },
-  {
-    "firstName": "Jasprit",
-    "lastName": "Bumrah",
-    "username": "boomboom",
-    "password": "fastbowl99",
-    "age": 29
-  },
-  {
-    "firstName": "Rishabh",
-    "lastName": "Pant",
-    "username": "rp17",
-    "password": "delhirocker",
-    "age": 27,
-    "bio": "Wicket keeper batsman"
-  },
-  {
-    "firstName": "Shubman",
-    "lastName": "Gill",
-    "username": "princegill",
-    "password": "younggun12",
+    "firstName": "Sophia",
+    "lastName": "Davis",
+    "profilePic": "https://i.pinimg.com/564x/e3/7b/d2/e37bd2d9d3057bb0f5423b50519e09f9.jpg",
+    "gender": "female",
+    "username": "sophia_d",
+    "password": "mySecurePass1",
+    "bio": "Dreamer. Reader. Writer.",
     "age": 25,
-    "hobbies": ["reading", "fielding"]
+    "hobbies": ["reading", "traveling"],
+    "isPremium": true
   },
   {
-    "firstName": "Suryakumar",
-    "lastName": "Yadav",
-    "username": "sky360",
-    "password": "skydominator",
-    "age": 33,
-    "bio": "360 degree player"
+    "firstName": "Noah",
+    "lastName": "Wilson",
+    "profilePic": "https://i.pinimg.com/564x/58/7a/f3/587af32a5e19c50b9c0c15b579ea2a13.jpg",
+    "gender": "male",
+    "username": "noahwilson",
+    "password": "strongPass88",
+    "bio": "Adventure is out there!",
+    "age": 30,
+    "hobbies": ["hiking", "photography"],
+    "isPremium": false
   },
   {
-    "firstName": "KL",
-    "lastName": "Rahul",
-    "username": "rahulkl",
-    "password": "opener789",
+    "firstName": "Olivia",
+    "lastName": "Martinez",
+    "profilePic": "https://i.pinimg.com/564x/2e/30/90/2e3090a1e33f1e21d36bc048abcfd1a0.jpg",
+    "gender": "female",
+    "username": "oliviam_art",
+    "password": "passWordz123",
+    "bio": "Minimalist | Designer",
+    "age": 26,
+    "hobbies": ["design", "sketching", "music"],
+    "isPremium": true
+  },
+  {
+    "firstName": "Ethan",
+    "lastName": "Lee",
+    "profilePic": "https://i.pinimg.com/564x/5b/97/5e/5b975e0fa3c9c5fa24d6df9b7ee177ef.jpg",
+    "gender": "male",
+    "username": "ethanlee90",
+    "password": "mypass456",
+    "bio": "Living one line of code at a time.",
     "age": 32,
-    "hobbies": ["fitness", "music"]
+    "hobbies": ["gaming", "coding"],
+    "isPremium": false
   },
   {
-    "firstName": "Yuzvendra",
-    "lastName": "Chahal",
-    "username": "chahal23",
-    "password": "spinwizard",
+    "firstName": "Ava",
+    "lastName": "Taylor",
+    "profilePic": "https://i.pinimg.com/564x/d3/b2/ef/d3b2effc8673089b3ed6e7aa3a98e8d0.jpg",
+    "gender": "female",
+    "username": "ava_t",
+    "password": "avaPass99",
+    "bio": "Yoga, tea, and tranquility.",
+    "age": 29,
+    "hobbies": ["yoga", "painting"],
+    "isPremium": false
+  },
+  {
+    "firstName": "James",
+    "lastName": "White",
+    "profilePic": "https://i.pinimg.com/564x/3a/f7/49/3af749465ce0e95dfb2853be5eae3786.jpg",
+    "gender": "male",
+    "username": "james_white",
+    "password": "whitePass88",
+    "bio": "Fitness first, always.",
+    "age": 35,
+    "hobbies": ["gym", "boxing", "travel"],
+    "isPremium": true
+  },
+  {
+    "firstName": "Mia",
+    "lastName": "Clark",
+    "profilePic": "https://i.pinimg.com/564x/29/f5/12/29f5127c2ae6a6a78be5f80532ae3be4.jpg",
+    "gender": "female",
+    "username": "mia_clarkx",
+    "password": "clarkMia12",
+    "bio": "Aspiring chef 🌮",
+    "age": 22,
+    "hobbies": ["cooking", "blogging"],
+    "isPremium": false
+  },
+  {
+    "firstName": "Lucas",
+    "lastName": "King",
+    "profilePic": "https://i.pinimg.com/564x/91/2c/13/912c13e5ea7cb26bc8ab8b9ed4901f2e.jpg",
+    "gender": "male",
+    "username": "lucas.king",
+    "password": "LucasStrong45",
+    "bio": "Born to create.",
+    "age": 27,
+    "hobbies": ["art", "cycling", "tech"],
+    "isPremium": true
+  },
+  {
+    "firstName": "Isabella",
+    "lastName": "Scott",
+    "profilePic": "https://i.pinimg.com/564x/6f/b6/63/6fb6632489143e1781942ed030c07e67.jpg",
+    "gender": "female",
+    "username": "isa_scott",
+    "password": "securePass000",
+    "bio": "Be kind 🌼",
+    "age": 24,
+    "hobbies": ["journaling", "nature walks"],
+    "isPremium": true
+  },
+  {
+    "firstName": "Benjamin",
+    "lastName": "Hill",
+    "profilePic": "https://i.pinimg.com/564x/61/94/99/6194999c29c73ce82c8c26ee23d8dc82.jpg",
+    "gender": "male",
+    "username": "ben.hill",
+    "password": "passBen321",
+    "bio": "Music and code is my vibe.",
+    "age": 23,
+    "hobbies": ["guitar", "frontend dev"],
+    "isPremium": false
+  },
+  {
+    "firstName": "Emily",
+    "lastName": "Wright",
+    "profilePic": "https://i.pinimg.com/564x/f4/f3/35/f4f3350249db27df9f82f471bdf12966.jpg",
+    "gender": "female",
+    "username": "emilywright",
+    "password": "EmiSecure01",
+    "bio": "Poet in a digital world.",
     "age": 31,
-    "bio": "Chess and spin bowler",
-    "hobbies": ["chess", "pranks"]
-  }
+    "hobbies": ["poetry", "baking"],
+    "isPremium": false
+  },
+  {
+    "firstName": "Henry",
+    "lastName": "Lopez",
+    "profilePic": "https://i.pinimg.com/564x/18/34/1c/18341cf34d3c5e9f34080c019ad6100b.jpg",
+    "gender": "male",
+    "username": "henrylopez",
+    "password": "LopezH123",
+    "bio": "Always learning.",
+    "age": 34,
+    "hobbies": ["reading", "investing"],
+    "isPremium": false
+  },
+  {
+    "firstName": "Grace",
+    "lastName": "Hall",
+    "profilePic": "https://i.pinimg.com/564x/50/e5/71/50e571fa4f06b208bd4cf598fc1cf58f.jpg",
+    "gender": "female",
+    "username": "gracehall",
+    "password": "graceGrace22",
+    "bio": "Chasing light and dreams.",
+    "age": 21,
+    "hobbies": ["photography", "travel"],
+    "isPremium": false
+  },
+  {
+    "firstName": "Daniel",
+    "lastName": "Green",
+    "profilePic": "https://i.pinimg.com/564x/5e/5c/79/5e5c795c1d91fdd65b705f1f1731e2fd.jpg",
+    "gender": "male",
+    "username": "dan_green",
+    "password": "greenPass09",
+    "bio": "Nature is home.",
+    "age": 36,
+    "hobbies": ["camping", "birdwatching"],
+    "isPremium": true
+  },
+  [
+    {
+      "firstName": "Chris",
+      "lastName": "Hemsworth",
+      "profilePic": "https://example.com/chris.jpg",
+      "gender": "male",
+      "username": "thor_hem",
+      "password": "AvengersAssemble",
+      "bio": "God of Thunder.",
+      "age": 40,
+      "hobbies": ["fitness", "surfing"],
+      "isPremium": true
+    },
+
+    {
+      "firstName": "Gal",
+      "lastName": "Gadot",
+      "profilePic": "https://example.com/gal.jpg",
+      "gender": "female",
+      "username": "wonder_gal",
+      "password": "W0nderWoman",
+      "bio": "Princess of Themyscira.",
+      "age": 38,
+      "hobbies": ["fitness", "combat training"],
+      "isPremium": true
+    },
+    {
+      "firstName": "Ryan",
+      "lastName": "Reynolds",
+      "profilePic": "https://example.com/ryan.jpg",
+      "gender": "male",
+      "username": "mr_reynolds",
+      "password": "Deadpool2025",
+      "bio": "Merc with a mouth.",
+      "age": 47,
+      "hobbies": ["acting", "joking"],
+      "isPremium": false
+    }
+  ]
 ]

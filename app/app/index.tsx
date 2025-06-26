@@ -1,25 +1,32 @@
+import Loader from '@/components/Loader';
 import { getData } from '@/libs/asyncStorage.libs';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { View } from 'react-native';
 
 export default function Index() {
-  console.log('index is called');
+  console.log('index');
 
   const router = useRouter();
 
-    useEffect(() => {
-    (async () => {
-      const token = await getData('user_token');
-      if(!token && typeof token !== "string") router.replace("/(auth)/login");
-      else router.replace("/(auth)/login")
+  useEffect(() => {
+    setTimeout(() => {
+      const redirectToLastScreen = async () => {
+        const lastRoute = await getData('lastRoute');
+        console.log("last route " , lastRoute)
+        if (lastRoute) {
+          router.replace(lastRoute);
+        } else {
+          router.replace('/(tabs)/explore');
+        }
+      };
+      redirectToLastScreen();
+    }, 0);
+  }, [router]);
 
-      console.log('token:', token);
-    })();
-  }, []);
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="small" />
+      <Loader />
     </View>
   );
 }

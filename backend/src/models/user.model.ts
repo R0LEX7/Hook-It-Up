@@ -10,6 +10,14 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    profilePic: {
+      type: String,
+    },
+    gender : {
+      type: String,
+      enum: ["male", "female"],
+      required: true,
+    },
     username: {
       type: String,
       required: true,

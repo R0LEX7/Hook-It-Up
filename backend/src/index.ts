@@ -9,7 +9,7 @@ import {
   feedRouter,
   paymentRouter,
 } from "./routes";
-import cors from 'cors'
+import cors from "cors";
 import { z } from "zod";
 
 const app = express();
@@ -17,13 +17,30 @@ const PORT: number = Number(process.env.PORT) || 3000;
 
 connectToDatabase();
 
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-  })
-);
+const allowedOrigins = [
+  "http://localhost:8081",
+  "http://192.168.1.6:8081",
+  "https://your-frontend.com",
+];
 
+const corsOptions = {
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true); // allow
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json());
 
 app.get("/hello", (req: Request, res: Response) => {
@@ -47,5 +64,5 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 app.listen(PORT, () => {
-  console.log("Server listening on port " , PORT);
+  console.log("Server listening on port ", PORT);
 });
