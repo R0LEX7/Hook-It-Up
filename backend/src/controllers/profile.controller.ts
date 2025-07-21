@@ -40,19 +40,30 @@ export const updateProfile = asyncHandler<IGetUserAuthInfoRequest>(
     );
 
     if (!isUpdateValid || !req.body) {
-      return res.status(400).json({ message: "Invalid update fields" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid update fields" });
     }
 
     let user = req.user;
     if (!user || user === undefined)
-      return res.status(401).json({ message: "User not found" });
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found" });
 
     Object.keys(req.body).forEach((key) => (user[key] = req.body[key]));
 
     await user.save();
-    if (!user) res.status(401).json({ message: `user doesn't exists` });
+    if (!user)
+      res.status(401).json({ success: false, message: `user doesn't exists` });
 
-    res.status(200).json({ user: user });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "User updated successfully",
+        user: user,
+      });
   }
 );
 
@@ -67,13 +78,17 @@ export const updatePassword = asyncHandler<IGetUserAuthInfoRequest>(
     const isUserValid = await verify(user.password, oldPassword);
 
     if (!isUserValid)
-      res.status(401).json({ message: "Password doesn`t match" });
+      res
+        .status(401)
+        .json({ success: false, message: "Password doesn`t match" });
 
     const hashedPassword = await hash(newPassword);
     user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({ message: "Password updated successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Password updated successfully" });
   }
 );
 
@@ -84,7 +99,10 @@ export const deleteProfile = asyncHandler<IGetUserAuthInfoRequest>(
 
     user.remove();
 
-    res.status(204).json({ message: `${user?.username} deleted Successfully` });
+    res.status(204).json({
+      success: true,
+      message: `${user?.username} deleted Successfully`,
+    });
   }
 );
 
