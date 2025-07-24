@@ -8,6 +8,7 @@ import {
   connectionRequestRouter,
   feedRouter,
   paymentRouter,
+  chatRouter,
 } from "./routes";
 import cors from "cors";
 import { z } from "zod";
@@ -49,6 +50,7 @@ app.get("/hello", (req: Request, res: Response) => {
 
 app.use("/auth", authRouter);
 app.use("/feed", feedRouter);
+app.use("/chat", chatRouter);
 app.use("/profile", profileRouter);
 app.use("/payment", paymentRouter);
 app.use("/connection", connectionRequestRouter);
