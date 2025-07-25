@@ -1,11 +1,23 @@
-import { Request, Response, NextFunction } from "express";
-import { z } from "zod";
+
+import { ZodSchema } from "zod";
 import { asyncHandler } from "../config/asyncHandler";
 import { IGetUserAuthInfoRequest } from "../Interfaces/user.interfaces";
+import { Response, NextFunction } from "express";
 
-export const validate = (schema: z.ZodSchema , source :"body" | "params" |"query" = "body") => {
-  return asyncHandler<IGetUserAuthInfoRequest>((req , res : Response , next : NextFunction) => {
-    schema.parse(req[source]);
-    next()
-  })
+export enum RequestPart {
+  BODY = "body",
+  PARAMS = "params",
+  QUERY = "query",
+}
+
+export const validate = (
+  schema: ZodSchema,
+  source: RequestPart = RequestPart.BODY
+) => {
+  return asyncHandler<IGetUserAuthInfoRequest>(
+    (req, res: Response, next: NextFunction) => {
+      schema.parse(req[source]);
+      next();
+    }
+  );
 };

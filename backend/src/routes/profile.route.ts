@@ -13,8 +13,8 @@ import { updatePasswordSchema, updateProfileSchema } from "../schemas/user.schem
 const router: Router = Router();
 
 router.get("/view", isAuthenticated, getProfile);
-router.post("/edit", isAuthenticated, validate(updateProfileSchema , "body"), updateProfile);
-router.patch("/password", isAuthenticated, validate(updatePasswordSchema , "body"), updatePassword);
+router.post("/edit", isAuthenticated, validate(updateProfileSchema), updateProfile);
+router.patch("/password", isAuthenticated, validate(updatePasswordSchema), updatePassword);
 router.delete("/delete", isAuthenticated, deleteProfile);
 
 export default router;

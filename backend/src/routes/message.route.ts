@@ -1,7 +1,8 @@
+
 import express, { Router } from "express";
 import { isAuthenticated } from "../middlewares/user.middleware";
-import { deleteMessage, editMessage, getMessages, sendMessage } from "../controllers/message.controller";
-import { validate } from "../middlewares/validate.middleware";
+import { deleteMessage, editMessage, getMessages, seenMessage, sendMessage } from "../controllers/message.controller";
+import { RequestPart, validate } from "../middlewares/validate.middleware";
 import { deleteMessageSchema, editMessageSchema, getMessagesSchema, sendMessageSchema } from "../schemas/message.schema";
 
 const router: Router = express.Router();
@@ -13,9 +14,10 @@ const router: Router = express.Router();
 4. DELETE : message
  */
 
-router.get("/all" , isAuthenticated ,validate(getMessagesSchema), getMessages);
+router.get("/all/:chatRoomId" , isAuthenticated , validate(getMessagesSchema, RequestPart.PARAMS), getMessages);
 router.post("/send" , isAuthenticated ,validate(sendMessageSchema), sendMessage);
-router.patch("/edit" , isAuthenticated ,validate(editMessageSchema), editMessage);
+router.put("/edit" , isAuthenticated ,validate(editMessageSchema), editMessage);
+router.put("/seen" , isAuthenticated ,validate(deleteMessageSchema), seenMessage);
 router.delete("/delete" , isAuthenticated ,validate(deleteMessageSchema), deleteMessage);
 
 export default router
