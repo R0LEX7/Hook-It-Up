@@ -3,7 +3,7 @@ import { asyncHandler } from "../config/asyncHandler";
 import { IGetUserAuthInfoRequest } from "../Interfaces/user.interfaces";
 import { chatModel } from "../models/chat.model";
 import { UserModal } from "../models/user.model";
-import { USER_POP_CONST } from "../constants/user.constant";
+import { USER_POP_CONST, USER_QUERY_CONST } from "../constants/user.constant";
 import { connectionRequestModel } from "../models/connectionRequest.model";
 import { IConnectionRequest } from "../Interfaces/connectionRequest.interfaces";
 import { FINAL_STATUSES } from "../constants/status.constant";
@@ -16,20 +16,88 @@ import { messageModel } from "../models/message.model.";
 
 export const getChats = asyncHandler<IGetUserAuthInfoRequest>(
   async (req, res: Response) => {
-
     const chatRooms = await chatModel
-      .find({
-        members: { $all: req.user._id }
-      } ,  {
-          members : 1, lastMessage : 1 , lastMessageAt : 1
-        })
-      .populate("members", USER_POP_CONST).populate("lastMessage", "messageType text mediaUrl isDeleted")
+      .find(
+        {
+          members: { $all: req.user._id },
+        },
+        {
+          members: 1,
+          lastMessage: 1,
+          lastMessageAt: 1,
+        }
+      )
+      .populate("members", USER_POP_CONST)
+      .populate("lastMessage", "messageType text mediaUrl isDeleted");
 
     return res.status(200).json({
       success: true,
       message: "All chats fetched",
       data: chatRooms,
-      count : chatRooms.length
+      count: chatRooms.length,
+    });
+  }
+);
+
+export const getAvailableUsersToChat = asyncHandler<IGetUserAuthInfoRequest>(
+  async (req, res: Response) => {
+    const user = req.user;
+
+    // find all connection of users
+    const connections = await connectionRequestModel.find(
+      { status : "accepted" , $or: [{ senderId: user.id }, { receiverId: user.id }] },
+      { senderId: 1, receiverId: 1 , _id : 0 }
+    ).lean();
+
+    if (!connections.length) {
+      return res.status(200).json({success: true,message: 'No connected users available',
+        data: [],
+        count: 0
+      });
+    }
+
+
+    // find all existing chats of users
+    const existingChats = await chatModel.find(
+      { members: { $all: req.user._id } },
+      { members: 1  , _id : 0}
+    ).lean();
+
+    const uniqueConnectionUsersIdSet = new Set()
+   connections.forEach(connection => {
+      uniqueConnectionUsersIdSet.add(String(connection.senderId));
+      uniqueConnectionUsersIdSet.add(String(connection.receiverId));
+    });
+
+    const uniqueExistingChatUsersIdSet = new Set();
+
+      existingChats.forEach(chat => {
+      chat.members.forEach(member => {
+        uniqueExistingChatUsersIdSet.add(String(member));
+      });
+    });
+
+    // remove user id from both
+    uniqueConnectionUsersIdSet.delete(String(user._id));
+    uniqueExistingChatUsersIdSet.delete(String(user._id));
+
+
+
+  const availableUsersToChatIds = [...uniqueConnectionUsersIdSet].filter(
+  (connectedUserId) => !uniqueExistingChatUsersIdSet.has(connectedUserId)
+  );
+
+
+  console.log(availableUsersToChatIds);
+
+  const availableUsersToChat = await UserModal.find({_id : {$in : availableUsersToChatIds}}, USER_QUERY_CONST).lean()
+
+
+    return res.status(200).json({
+      success: true,
+      message: "All chats fetched",
+      data: availableUsersToChat,
+      count: availableUsersToChat.length
     });
   }
 );
