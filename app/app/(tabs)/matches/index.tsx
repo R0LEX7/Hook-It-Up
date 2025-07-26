@@ -54,7 +54,7 @@ const Index = () => {
           setMatches(matchesRes.data.matches);
         }
       } catch (err) {
-        console.error(err);
+        console.log(err);
       } finally {
         setIsLoading(false);
       }
@@ -63,7 +63,7 @@ const Index = () => {
     fetchData();
   }, []);
 
-  console.log('matches ', matches);
+
 
   const Reusable: React.FC<{ message: string }> = ({ message }) => (
     <View className=" h-2/5 w-full items-center justify-center">
@@ -72,7 +72,7 @@ const Index = () => {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: android ? hp(5) : 0 }}>
+    <SafeAreaView style={{ flex: 1, paddingTop: android ? hp(6) : 0 }}>
       {isLoading ? (
         <Loader />
       ) : (
@@ -84,9 +84,9 @@ const Index = () => {
               </Text>
             </View>
             {matches.length === 0 ? (
-              <Reusable message={'You have no Requests!!'} />
+              <Reusable message={'You have no Matches!!'} />
             ) : (
-              <Matches matches={matches} />
+              <Matches users={matches} setUsers={setMatches} type='match'/>
             )}
           </View>
           {/* search bar */}

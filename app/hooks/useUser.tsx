@@ -31,7 +31,6 @@ const useUser = () => {
         if (res?.data?.user) {
           setUser(res.data.user);
         }
-        console.log('user res ', res.data.user);
       } finally {
         setLoading(false);
       }

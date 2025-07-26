@@ -1,9 +1,8 @@
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import {
-  DarkTheme,
   DefaultTheme,
-  ThemeProvider,
+  ThemeProvider
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Slot } from 'expo-router';
@@ -27,11 +26,11 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={DefaultTheme}>
       <Slot />
 
       <Toast />
-      <StatusBar style="auto" />
+      <StatusBar hidden style= {colorScheme === "dark" ? "dark" : "light"} />
     </ThemeProvider>
   );
 }

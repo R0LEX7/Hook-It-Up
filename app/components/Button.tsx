@@ -1,4 +1,5 @@
 import { FONT } from '@/constants/fonts.constant';
+import { PRIMARY } from '@/constants/myColor';
 import React from 'react';
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 import Animated, {
@@ -6,7 +7,6 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface IProps {
   title: string;
@@ -34,22 +34,23 @@ const Button: React.FC<IProps> = ({ title, onPressHandler  , loading = false}) =
       onPress={onPressHandler}
       style={[
         {
-          width: wp(70),
-          height: wp(10),
-          borderRadius: 8,
-          backgroundColor: 'black',
+          // width: wp(70),
+          // height: wp(10),
+          borderRadius: 6,
+          backgroundColor: PRIMARY,
           justifyContent: 'center',
           alignItems: 'center',
         },
         animatedStyle,
       ]}
+      className={"h-[50px] w-[300px] px-4"}
     >
       {loading ? (
         <ActivityIndicator size={'small'} color={'white'} />
       ) : (
         <Text
           style={{ fontFamily: FONT.medium }}
-          className="text-white text-center capitalize text-xl"
+          className="text-white text-center capitalize text-xl "
         >
           {title}
         </Text>

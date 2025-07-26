@@ -1,3 +1,4 @@
+import BackButton from '@/components/BackButton';
 import Button from '@/components/Button';
 import { HobbiesInput } from '@/components/HobbiesInput';
 import InputField from '@/components/Input';
@@ -12,11 +13,13 @@ import { getData } from '@/libs/asyncStorage.libs';
 import { uploadToCloudinary } from '@/libs/cloudinary';
 import { getToast } from '@/libs/Toast.libs';
 import { profileSchema } from '@/schemas/profile.schema';
+import { useUserStore } from '@/store/user.store';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
+
 import {
   Image,
   KeyboardAvoidingView,
@@ -33,6 +36,8 @@ interface IProps {
 
 const Register = ({ user }: IProps) => {
   const router = useRouter();
+
+  const { setUser } = useUserStore();
 
   const [credentials, setCredentials] = useState(user);
 
@@ -102,6 +107,7 @@ const Register = ({ user }: IProps) => {
       console.log('res ', res);
 
       if (res?.status === 200) {
+        setUser(res?.data?.user);
         getToast(
           'success',
           'Profile Edited Successfully',
@@ -126,7 +132,9 @@ const Register = ({ user }: IProps) => {
       base64: true,
     });
     if (!result.canceled) {
-      setPreview(result.assets[0].uri);
+      const selectedImage = result.assets[0];
+      setPreview(selectedImage.uri); // for display
+      setImage(`data:image/jpeg;base64,${selectedImage.base64}`);
       setOpen(true);
       console.log(result.assets[0].uri);
     }
@@ -163,17 +171,20 @@ const Register = ({ user }: IProps) => {
           <PreviewModal
             uri={preview}
             visible={open}
-            onClose={() => {
-              setImage(preview);
+            onClose={() => setOpen(false)}
+            onCancel={() => {
+              setImage(null);
               setOpen(false);
             }}
-            onCancel={() => setOpen(false)}
           />
         )}
         <ScrollView
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 10 }}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          className="relative"
         >
+          <BackButton />
           <View style={{ alignItems: 'center' }} className="mb-4">
             <Text
               style={{

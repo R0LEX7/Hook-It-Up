@@ -10,7 +10,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  console.log('auth guard called');
+
 
   useEffect(() => {
     if (!isLoading && !user) {

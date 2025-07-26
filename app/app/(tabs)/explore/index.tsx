@@ -1,7 +1,10 @@
+import Button from '@/components/Button';
 import DatesCard from '@/components/DatesCard';
 import Loader from '@/components/Loader';
 import { BASE_URI } from '@/constants/api';
 import { dummyPfp } from '@/constants/dummy.constant';
+import { FONT } from '@/constants/fonts.constant';
+import { PRIMARY } from '@/constants/myColor';
 import { IUser } from '@/interfaces/user.interface';
 import { withErrorHandler } from '@/libs';
 import { getData } from '@/libs/asyncStorage.libs';
@@ -31,6 +34,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [feedData, setFeedData] = useState<IUser[]>([]);
   const { user } = useUserStore();
+  const [page, setPage] = useState<number>(1);
 
   const router = useRouter();
 
@@ -42,6 +46,7 @@ const Index = () => {
 
         const res = await withErrorHandler(async () => {
           return await axios.get(BASE_URI + 'feed', {
+            params: { page },
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -58,7 +63,6 @@ const Index = () => {
 
         const INVALID_USER_STATUS = [400, 401, 404];
 
-        console.log('res code', res?.status);
         if (res?.status && INVALID_USER_STATUS.includes(res?.status)) {
           router.replace('/(auth)/login');
         }
@@ -68,13 +72,13 @@ const Index = () => {
     };
 
     fetchData();
-  }, [router]);
+  }, [router, page]);
 
   const handleSwipe = async (status: string, index: number) => {
     try {
       const userId = feedData[index]._id;
       const token = await getData('user_token');
-      const res = await withErrorHandler(async () => {
+       await withErrorHandler(async () => {
         return await axios.post(
           BASE_URI + `connection/send/${status}/${userId}`,
           null,
@@ -86,11 +90,33 @@ const Index = () => {
         );
       })();
 
-      console.log('res', res);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const NoDataComp = () => (
+<View className='p-4 h-3/4 flex items-center justify-center'>
+      <View
+      className={`border-[${PRIMARY}] rounded-md border-2 flex justify-evenly items-center flex-col`}
+      style={{ height: hp(35) }}
+    >
+      <View className='mb-3'>
+        <Text className='text-xl text-center text-pretty' style={{fontFamily : FONT.semiBold}}>You Have No dates now for explore.</Text>
+        <Text className='text-lg text-center text-pretty' style={{fontFamily : FONT.medium}}>You can go to your matches and requests or your profile.</Text>
+      </View>
+      <Button
+        title="requests"
+        onPressHandler={() => router.push('/(tabs)/matches')}
+      />
+           <Text className='text-lg text-center text-pretty' style={{fontFamily : FONT.medium}}> OR</Text>
+      <Button
+        title="profile"
+        onPressHandler={() => router.push('/(tabs)/profile')}
+      />
+    </View>
+</View>
+  );
 
   return (
     <SafeAreaView
@@ -149,30 +175,37 @@ const Index = () => {
           </View>
 
           <View style={{ height: height * 0.77 }}>
-            <Swiper
-              cards={feedData}
-              renderCard={(user: IUser) => (
-                <DatesCard
-                  date={user}
-                  handleClick={(date) => console.log('hyy', date)}
-                />
-              )}
-              onSwipedLeft={(index) => handleSwipe('ignored', index)}
-              onSwipedRight={(index) => handleSwipe('interested', index)}
-              backgroundColor="transparent"
-              cardIndex={0}
-              stackSize={2}
-              showSecondCard={true}
-              infinite={false}
-              stackSeparation={10}
-              disableTopSwipe
-              disableBottomSwipe
-              animateCardOpacity
-              useViewOverflow={false}
-              cardVerticalMargin={0}
-              verticalSwipe={false}
-              containerStyle={styles.container}
-            />
+            {!isLoading && feedData.length === 0 ? (
+              <NoDataComp />
+            ) : (
+              <Swiper
+                cards={feedData}
+                renderCard={(user: IUser) => (
+                  <DatesCard
+                    date={user}
+
+                  />
+                )}
+                onSwipedLeft={(index) => handleSwipe('ignored', index)}
+                onSwipedRight={(index) => handleSwipe('interested', index)}
+                backgroundColor="transparent"
+                cardIndex={0}
+                stackSize={2}
+                showSecondCard={true}
+                infinite={false}
+                stackSeparation={10}
+                disableTopSwipe
+                disableBottomSwipe
+                animateCardOpacity
+                useViewOverflow={false}
+                cardVerticalMargin={0}
+                verticalSwipe={false}
+                containerStyle={styles.container}
+                onSwipedAll={() => {
+                  setPage((page) => page + 1);
+                }}
+              />
+            )}
           </View>
         </>
       )}

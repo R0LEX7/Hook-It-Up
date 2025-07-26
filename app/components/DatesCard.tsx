@@ -8,18 +8,16 @@ import {
   Dimensions,
   Image,
   Text,
-  TouchableWithoutFeedback,
-  View,
+  View
 } from 'react-native';
 
 let { width, height } = Dimensions.get('window');
 
 interface IProps {
   date: IUser;
-  handleClick: (date: IUser) => void;
 }
 
-const DatesCard = memo(({ date, handleClick }: IProps) => {
+const DatesCard = memo(({ date}: IProps) => {
   if (!date) return null;
 
   const getHobbie = () => {
@@ -33,14 +31,14 @@ const DatesCard = memo(({ date, handleClick }: IProps) => {
 
   return (
     <View className="relative rounded-3xl" style={{ backgroundColor: 'white' }}>
-      <TouchableWithoutFeedback onPress={() => handleClick(date)}>
+      <View>
         <Image
           source={{ uri: date.profilePic || dummyPfp }}
           style={{ height: height * 0.7 }}
           resizeMode="cover"
           className="rounded-3xl"
         />
-      </TouchableWithoutFeedback>
+      </View>
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,0.9)']}
         className="w-full"

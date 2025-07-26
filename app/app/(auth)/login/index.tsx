@@ -1,5 +1,8 @@
+import Button from '@/components/Button';
+import CheckBox from '@/components/CheckBox';
 import InputField from '@/components/Input';
 import { BASE_URI } from '@/constants/api';
+import { FONT } from '@/constants/fonts.constant';
 import { PRIMARY, SECONDARY } from '@/constants/myColor';
 import { storeData } from '@/libs/asyncStorage.libs';
 import { withErrorHandler } from '@/libs/errorHandler.libs';
@@ -10,7 +13,6 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Pressable,
@@ -31,6 +33,7 @@ const Login: React.FC = () => {
     password: '',
   });
 
+  const [hidePassword, setHidePassword] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleLogin = async () => {
@@ -55,8 +58,7 @@ const Login: React.FC = () => {
         return await axios.post(BASE_URI + 'auth/login', credentials);
       })();
 
-      console.log("res " , res);
-
+      console.log('res ', res);
 
       if (res?.status === 200 && res.data?.token) {
         const token = res.data.token;
@@ -66,10 +68,9 @@ const Login: React.FC = () => {
           'Login Successful',
           `${credentials.username} welcome to HookItUp`,
         );
-        router.replace("/(tabs)/explore")
+        router.replace('/(tabs)/explore');
       } else {
-        const errorMsg =
-          res?.message || 'Login failed. Please try again.';
+        const errorMsg = res?.data.message || 'Login failed. Please try again.';
         getToast('error', 'Login Failed', errorMsg);
       }
     } finally {
@@ -84,8 +85,8 @@ const Login: React.FC = () => {
     >
       <StatusBar style="dark" />
 
-      <View style={{ height: 200, backgroundColor: PRIMARY, width: '100%' }}>
-        <View
+      <View style={{ height: 200, width: '100%' }}>
+        {/* <View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -98,21 +99,26 @@ const Login: React.FC = () => {
               uri: 'https://cdn-icons-png.flaticon.com/128/6655/6655045.png',
             }}
           />
-        </View>
+        </View> */}
 
         <Text
           style={{
-            marginTop: 20,
+            marginTop: 30,
             textAlign: 'center',
             fontSize: 20,
-            fontFamily: 'GillSans-SemiBold',
+            fontFamily: FONT.medium,
           }}
+          className="tracking-widest"
         >
           HookItUp!!!
         </Text>
       </View>
 
-      <KeyboardAvoidingView>
+      <KeyboardAvoidingView
+        style={{ alignItems: 'center', height: 100, marginTop: 23, flex: 1 }}
+        behavior="padding"
+        keyboardVerticalOffset={0}
+      >
         <View style={{ alignItems: 'center' }}>
           <Text
             style={{
@@ -120,6 +126,7 @@ const Login: React.FC = () => {
               fontWeight: 'bold',
               marginTop: 25,
               color: PRIMARY,
+              fontFamily: FONT.medium,
             }}
           >
             Log in to your Account
@@ -142,7 +149,7 @@ const Login: React.FC = () => {
         </View>
 
         <View style={{ marginTop: 20 }}>
-          <View className='mt-2'>
+          <View className="mt-4">
             <InputField
               placeholder="Enter your Username*"
               placeholderTextColor={SECONDARY}
@@ -160,11 +167,11 @@ const Login: React.FC = () => {
         </View>
 
         <View>
-          <View className='mt-2'>
+          <View className="mt-6">
             <InputField
               placeholder="Enter your Password*"
               placeholderTextColor={SECONDARY}
-              secureTextEntry={true}
+              secureTextEntry={hidePassword}
               value={credentials.password}
               onChangeText={(text: string) =>
                 setCredentials({ ...credentials, password: text })
@@ -176,48 +183,19 @@ const Login: React.FC = () => {
               </Text>
             )}
           </View>
+          <CheckBox
+            title="show password"
+            isChecked={!hidePassword}
+            onPressHandler={() => setHidePassword(!hidePassword)}
+          />
         </View>
 
-        <View
-          style={{
-            marginTop: 12,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text>Keep me logged in</Text>
-
-          <Text style={{ color: '#007FFF', fontWeight: '500' }}>
-            Forgot Password
-          </Text>
-        </View>
-
-        <View style={{ marginTop: 50 }}>
-          {isLoading && <ActivityIndicator size={'large'} />}
-          <Pressable
-            onPress={handleLogin}
-            disabled={isLoading}
-            style={{
-              width: 200,
-              backgroundColor: PRIMARY,
-              borderRadius: 6,
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              padding: 15,
-            }}
-          >
-            <Text
-              style={{
-                textAlign: 'center',
-                color: 'white',
-                fontSize: 16,
-                fontWeight: 'bold',
-              }}
-            >
-              {isLoading ? 'Logging in...' : 'Login'}
-            </Text>
-          </Pressable>
+        <View style={{ marginTop: 30 }}>
+          <Button
+            onPressHandler={handleLogin}
+            loading={isLoading}
+            title={isLoading ? 'Logging in...' : 'Login'}
+          />
 
           <Pressable
             onPress={() => router.replace('/register')}

@@ -1,5 +1,8 @@
+import Button from '@/components/Button';
+import CheckBox from '@/components/CheckBox';
 import InputField from '@/components/Input';
 import { BASE_URI } from '@/constants/api';
+import { FONT } from '@/constants/fonts.constant';
 import { PRIMARY, SECONDARY } from '@/constants/myColor';
 import { withErrorHandler } from '@/libs/errorHandler.libs';
 import { getToast } from '@/libs/Toast.libs';
@@ -13,19 +16,20 @@ import {
   Image,
   KeyboardAvoidingView,
   Pressable,
+  ScrollView,
   Text,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
- interface IRegisterUser {
+interface IRegisterUser {
   username: string;
   lastName: string;
   firstName: string;
-  age:  number;
+  age: number;
   password: string;
-  hobbies ?:string[],
-  profilePic ?: string
+  hobbies?: string[];
+  profilePic?: string;
 }
 
 const Register: React.FC = () => {
@@ -48,13 +52,17 @@ const Register: React.FC = () => {
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hidePassword, setHidePassword] = useState<boolean>(true);
 
   const handleRegister = async () => {
     setIsLoading(true);
 
     console.log('click');
 
-    const userCredentials : IRegisterUser = { ...credentials, age: Number(credentials.age) };
+    const userCredentials: IRegisterUser = {
+      ...credentials,
+      age: Number(credentials.age),
+    };
 
     /* form validation*/
     const validation = registerSchema.safeParse(userCredentials);
@@ -105,161 +113,184 @@ const Register: React.FC = () => {
       <StatusBar style="dark" />
 
       <KeyboardAvoidingView
-        style={{ alignItems: 'center', height: 100, marginTop: 30 }}
+        style={{ flex: 1 }}
+        behavior="padding"
+        keyboardVerticalOffset={10}
       >
-        <View
-          style={{
-            justifyContent: 'center',
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
             alignItems: 'center',
-            marginTop: 20,
+            paddingTop: 23,
           }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <Image
-            style={{ width: 100, height: 80, resizeMode: 'cover' }}
-            source={{
-              uri: 'https://cdn-icons-png.flaticon.com/128/2509/2509078.png',
-            }}
-          />
-        </View>
 
-        <View style={{ alignItems: 'center' }}>
-          <Text
+          <View
             style={{
-              fontSize: 17,
-              fontWeight: 'bold',
-              marginTop: 25,
-              color: PRIMARY,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 20,
             }}
           >
-            Create your Account
-          </Text>
-        </View>
+            <Image
+              style={{ width: 100, height: 80, resizeMode: 'cover' }}
+              source={{
+                uri: 'https://cdn-icons-png.flaticon.com/128/2509/2509078.png',
+              }}
+            />
+          </View>
 
-        <View>
-          <InputField
-            placeholder="Enter your Firstname*"
-            placeholderTextColor={SECONDARY}
-            value={credentials.firstName}
-            onChangeText={(text: string) =>
-              setCredentials({ ...credentials, firstName: text })
-            }
-          />
-          {formErrors.firstName && (
-            <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
-              {formErrors.firstName}
-            </Text>
-          )}
-        </View>
-
-        <View>
-          <InputField
-            placeholder="Enter your Lastname*"
-            placeholderTextColor={SECONDARY}
-            value={credentials.lastName}
-            onChangeText={(text: string) =>
-              setCredentials({ ...credentials, lastName: text })
-            }
-          />
-          {formErrors.lastName && (
-            <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
-              {formErrors.lastName}
-            </Text>
-          )}
-        </View>
-
-        <View>
-          <InputField
-            placeholder="Enter your Username*"
-            placeholderTextColor={SECONDARY}
-            value={credentials.username}
-            onChangeText={(text: string) =>
-              setCredentials({ ...credentials, username: text })
-            }
-          />
-          {formErrors.username && (
-            <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
-              {formErrors.username}
-            </Text>
-          )}
-        </View>
-
-        <View>
-          <InputField
-            placeholder="Enter your Age (e.g. 18)*"
-            placeholderTextColor={SECONDARY}
-            keyboardType="numeric"
-            maxLength={2}
-            value={credentials.age}
-            onChangeText={(text: string) => {
-              // Allow only digits and block everything else
-              if (/^\d{0,2}$/.test(text)) {
-                setCredentials({ ...credentials, age: text });
-              }
-            }}
-          />
-          {formErrors.age && (
-            <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
-              {formErrors.age}
-            </Text>
-          )}
-        </View>
-
-        <View>
-          <InputField
-            placeholder="Enter your Password*"
-            placeholderTextColor={SECONDARY}
-            secureTextEntry={true}
-            value={credentials.password}
-            onChangeText={(text: string) =>
-              setCredentials({ ...credentials, password: text })
-            }
-          />
-          {formErrors.password && (
-            <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
-              {formErrors.password}
-            </Text>
-          )}
-        </View>
-
-        <View style={{ marginTop: 25  }}>
-          <Pressable
-            onPress={handleRegister}
-            // disabled={isLoading}
-            style={{
-              width : 300,
-              backgroundColor: PRIMARY,
-              borderRadius: 6,
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              padding: 15,
-            }}
-          >
+          <View style={{ alignItems: 'center' }}>
             <Text
               style={{
-                textAlign: 'center',
-                color: 'white',
-                fontSize: 16,
+                fontSize: 17,
                 fontWeight: 'bold',
+                marginTop: 25,
+                color: PRIMARY,
+                fontFamily: FONT.semiBold,
               }}
             >
-              {isLoading ? 'Welcoming you..' : 'Register'}
+              Create your Account
             </Text>
-          </Pressable>
+          </View>
 
-          <Pressable onPress={() => router.replace('/(auth)/login')}>
-            <Text
-              style={{
-                textAlign: 'center',
-                color: 'gray',
-                fontSize: 16,
-                marginVertical: 10,
+          <View className="mt-10">
+            <InputField
+              placeholder="Enter your Firstname*"
+              placeholderTextColor={SECONDARY}
+              value={credentials.firstName}
+              onChangeText={(text: string) =>
+                setCredentials({ ...credentials, firstName: text })
+              }
+            />
+            {formErrors.firstName && (
+              <Text
+                style={{
+                  color: 'red',
+                  fontSize: 14,
+                  marginInline: 6,
+                  fontFamily: FONT.medium,
+                }}
+              >
+                {formErrors.firstName}
+              </Text>
+            )}
+          </View>
+
+          <View className="mt-6">
+            <InputField
+              placeholder="Enter your Lastname*"
+              placeholderTextColor={SECONDARY}
+              value={credentials.lastName}
+              onChangeText={(text: string) =>
+                setCredentials({ ...credentials, lastName: text })
+              }
+            />
+            {formErrors.lastName && (
+              <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
+                {formErrors.lastName}
+              </Text>
+            )}
+          </View>
+
+          <View className="mt-6">
+            <InputField
+              placeholder="Enter your Username*"
+              placeholderTextColor={SECONDARY}
+              value={credentials.username}
+              onChangeText={(text: string) =>
+                setCredentials({ ...credentials, username: text })
+              }
+            />
+            {formErrors.username && (
+              <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
+                {formErrors.username}
+              </Text>
+            )}
+          </View>
+
+          <View className="mt-6">
+            <InputField
+              placeholder="Enter your Age (e.g. 18)*"
+              placeholderTextColor={SECONDARY}
+              keyboardType="numeric"
+              maxLength={2}
+              value={credentials.age}
+              onChangeText={(text: string) => {
+                // Allow only digits and block everything else
+                if (/^\d{0,2}$/.test(text)) {
+                  setCredentials({ ...credentials, age: text });
+                }
               }}
+            />
+            {formErrors.age && (
+              <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
+                {formErrors.age}
+              </Text>
+            )}
+          </View>
+
+          <View className="mt-6">
+            <InputField
+              placeholder="Enter your Password*"
+              placeholderTextColor={SECONDARY}
+              secureTextEntry={hidePassword}
+              value={credentials.password}
+              onChangeText={(text: string) =>
+                setCredentials({ ...credentials, password: text })
+              }
+            />
+            {formErrors.password && (
+              <Text style={{ color: 'red', fontSize: 14, marginInline: 6 }}>
+                {formErrors.password}
+              </Text>
+            )}
+            <CheckBox
+              title="show password"
+              isChecked={!hidePassword}
+              onPressHandler={() => setHidePassword(!hidePassword)}
+            />
+          </View>
+
+          <View style={{ marginTop: 25 }}>
+            <Button
+              loading={isLoading}
+              onPressHandler={handleRegister}
+              title={isLoading ? 'Welcoming you..' : 'Register'}
+            />
+
+            <Pressable
+              onPress={() => router.replace('/(auth)/login')}
+              className="flex flex-row justify-center"
             >
-              Already have an account?
-              <Text style={{ color: PRIMARY , marginHorizontal: 8}}>Log in?</Text>
-            </Text>
-          </Pressable>
-        </View>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  color: 'gray',
+                  fontSize: 16,
+                  marginVertical: 10,
+                  fontFamily: FONT.medium,
+                }}
+              >
+                Already have an account?
+              </Text>
+              <Text
+                style={{
+                  color: PRIMARY,
+                  marginHorizontal: 8,
+                  fontWeight: 500,
+                  marginVertical: 10,
+                  fontFamily: FONT.semiBold,
+                }}
+                className="mx-3"
+              >
+                Log in?
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

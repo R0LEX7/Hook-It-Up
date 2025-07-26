@@ -5,7 +5,7 @@ const Layout = () => {
   return (
     <>
     <Stack screenOptions={{headerShown : false}}>
-    <Stack.Screen name='Profile'/>
+    <Stack.Screen name='explore'/>
     </Stack>
     </>
   )

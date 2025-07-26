@@ -1,3 +1,4 @@
+import { IChat } from './../interfaces/chat.interface';
 import { IUser } from '@/interfaces/user.interface';
 
 export const dummyUsers: IUser[] = [
@@ -112,6 +113,51 @@ export const dummyUsers: IUser[] = [
       'https://i.pinimg.com/736x/26/dd/27/26dd274544c1d2a46ee7e9e5da2ef70b.jpg',
   },
 ];
+
+export const dummyChatData :IChat[] =
+  [
+   {
+      "_id": "68821b15d1e00660161f8894",
+      "members": [
+        {
+          "_id": "6857d9ad7f8bfbea1e708644",
+          "firstName": "Ryan",
+          "lastName": "Reynolds",
+          "gender": "male",
+          "username": "mr_reynolds",
+          "age": 47,
+          "hobbies": [
+            "acting",
+            "joking"
+          ],
+          "isPremium": false,
+          "profilePic": "https://i.pinimg.com/736x/8e/62/f3/8e62f37965b7cf4c3164caa094ebfccf.jpg"
+        },
+        {
+          "_id": "6857d38ef666789950a9a57c",
+          "firstName": "Liam",
+          "lastName": "brow",
+          "gender": "male",
+          "username": "liam_brown01",
+          "age": 25,
+          "hobbies": [
+            "cricket",
+            "coding"
+          ],
+          "isPremium": false,
+          "profilePic": "https://res.cloudinary.com/dtrawqhte/image/upload/v1750949939/HookItUp/qrzigi5lyowqegu9omxk.jpg"
+        }
+      ],
+      "lastMessageAt": "2025-07-25T07:08:24.003Z",
+      "lastMessage": {
+        "_id": "68832d675c908659ec075de3",
+        "text": "",
+        "messageType": "text",
+        "isDeleted": true
+      }
+    }
+  ]
+
 
 export const dummyPfp =
   'https://i.pinimg.com/736x/0f/68/94/0f6894e539589a50809e45833c8bb6c4.jpg';

@@ -4,7 +4,7 @@ export default function Layout() {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="profile hai" />
+        <Stack.Screen name="matches" />
       </Stack>
     </>
   );

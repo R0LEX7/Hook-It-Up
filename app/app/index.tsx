@@ -14,7 +14,7 @@ export default function Index() {
       const redirectToLastScreen = async () => {
         const lastRoute = await getData('lastRoute');
         console.log("last route " , lastRoute)
-        if (lastRoute) {
+        if (lastRoute && lastRoute !== '/') {
           router.replace(lastRoute);
         } else {
           router.replace('/(tabs)/explore');

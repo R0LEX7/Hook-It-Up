@@ -7,6 +7,6 @@ export interface IUser {
   hobbies?: string[];
   profilePic?: string;
   bio?: string;
-  gender: string;
+  gender?: string;
   [key: string]: any;
 }
