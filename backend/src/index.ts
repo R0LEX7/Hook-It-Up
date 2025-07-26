@@ -1,7 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { connectToDatabase } from "./config";
+import { connectToDatabase, corsConfig, initializeSocket } from "./config";
 import express, { NextFunction, Request, Response } from "express";
+import { Server } from "socket.io"
+import { createServer } from "http";
 import {
   profileRouter,
   authRouter,
@@ -16,33 +18,18 @@ import { z } from "zod";
 
 const app = express();
 const PORT: number = Number(process.env.PORT) || 3000;
-
 connectToDatabase();
 
-const allowedOrigins = [
-  "http://localhost:8081",
-  "http://192.168.1.6:8081",
-  "https://your-frontend.com",
-];
+const server = createServer(app);
 
-const corsOptions = {
-  origin: function (
-    origin: string | undefined,
-    callback: (err: Error | null, allow?: boolean) => void
-  ) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true); // allow
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-};
+//initializing sockets here
+initializeSocket(server);
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+
+
+
+app.use(cors(corsConfig()));
+app.options("*", cors(corsConfig()));
 app.use(express.json());
 
 app.get("/hello", (req: Request, res: Response) => {
@@ -67,6 +54,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: "Something went wrong!!" });
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("Server listening on port ", PORT);
 });

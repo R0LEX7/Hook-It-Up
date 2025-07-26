@@ -1,4 +1,5 @@
 import { Document, Types } from "mongoose";
+import { IChat } from "./chat.interface";
 
 export interface IMessage extends Document {
   messageType: string;
@@ -6,7 +7,7 @@ export interface IMessage extends Document {
   mediaUrl: string;
   password: string;
   senderId: Types.ObjectId;
-  chatRoom: Types.ObjectId;
+  chatRoom: Types.ObjectId | IChat;
   receiverId: Types.ObjectId;
   isSeen: Boolean;
   isEdited: Boolean;

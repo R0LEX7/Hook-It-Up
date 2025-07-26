@@ -23,7 +23,7 @@ export const getChats = asyncHandler<IGetUserAuthInfoRequest>(
       } ,  {
           members : 1, lastMessage : 1 , lastMessageAt : 1
         })
-      .populate("members", "username profilePic isPremium age")
+      .populate("members", USER_POP_CONST).populate("lastMessage", "messageType text mediaUrl isDeleted")
 
     return res.status(200).json({
       success: true,
