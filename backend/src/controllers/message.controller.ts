@@ -15,19 +15,21 @@ import { IChat } from "../Interfaces/chat.interface";
  * 4. delete message
  */
 
-const isUserInChatroom = ( user : IUser ,  res  : Response, isChatroomExists : IChat) => {
+const isUserInChatroom = (
+  user: IUser,
+  res: Response,
+  isChatroomExists: IChat
+) => {
   const userId = user._id.toString();
 
-    if (!isChatroomExists.members.map((id) => id.toString()).includes(userId)) {
-      return res.status(403).json({
-        success: false,
-        message: "You are forbidden to access this chat",
-        data: null,
-      });
-    }
-
-
-}
+  if (!isChatroomExists.members.map((id) => id.toString()).includes(userId)) {
+    return res.status(403).json({
+      success: false,
+      message: "You are forbidden to access this chat",
+      data: null,
+    });
+  }
+};
 
 export const getMessages = asyncHandler<IGetUserAuthInfoRequest>(
   async (req, res: Response) => {
@@ -41,7 +43,7 @@ export const getMessages = asyncHandler<IGetUserAuthInfoRequest>(
         message: "Chat room isn't exist",
       });
     }
-    isUserInChatroom(req.user ,res , isChatroomExists)
+    isUserInChatroom(req.user, res, isChatroomExists);
 
     const messages = await messageModel
       .find(
@@ -53,8 +55,8 @@ export const getMessages = asyncHandler<IGetUserAuthInfoRequest>(
           text: 1,
           createdAt: 1,
           isSeen: 1,
-          isEdited : 1,
-          isDeleted : 1
+          isEdited: 1,
+          isDeleted: 1,
         }
       )
       .populate("senderId", "username profilePic")
@@ -79,7 +81,7 @@ export const sendMessage = asyncHandler<IGetUserAuthInfoRequest>(
   async (req, res: Response) => {
     const { chatRoomId, senderId, messageType } = req.body;
 
-    const isChatroomExists : IChat | null = await chatModel.findById(chatRoomId);
+    const isChatroomExists: IChat | null = await chatModel.findById(chatRoomId);
 
     if (!isChatroomExists) {
       return res.status(404).json({
@@ -88,7 +90,7 @@ export const sendMessage = asyncHandler<IGetUserAuthInfoRequest>(
       });
     }
 
-    isUserInChatroom(req.user ,res , isChatroomExists)
+    isUserInChatroom(req.user, res, isChatroomExists);
 
     const isSenderExists = await UserModal.findById(senderId);
 
@@ -100,17 +102,24 @@ export const sendMessage = asyncHandler<IGetUserAuthInfoRequest>(
 
     const user = req.user;
 
-    const messageTypeArray = ["text", "file", "image"];
+    if (messageType === "text" && !req.body.text?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Text can't be empty",
+        data: null,
+      });
+    }
 
-    messageTypeArray.map((type) => {
-      if (messageType === type && !req.body[type]) {
-        return res.status(404).json({
-          success: false,
-          message: "message can't be empty",
-          data: null,
-        });
-      }
-    });
+    if (
+      (messageType === "image" || messageType === "file") &&
+      !req.body.mediaUrl
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: `${messageType} mediaUrl can't be empty`,
+        data: null,
+      });
+    }
 
     const messageBody =
       messageType === "text"
@@ -139,9 +148,11 @@ export const sendMessage = asyncHandler<IGetUserAuthInfoRequest>(
     isChatroomExists.lastMessageAt = new Date();
 
     await isChatroomExists.save();
-    return res
-      .status(201)
-      .json({ success: true, message: "Message send successfully" , data : message });
+    return res.status(201).json({
+      success: true,
+      message: "Message send successfully",
+      data: message,
+    });
   }
 );
 
@@ -154,28 +165,34 @@ export const editMessage = asyncHandler<IGetUserAuthInfoRequest>(
     if (!message) {
       return res
         .status(404)
-        .json({ success: false, message: "message not found", data : null });
+        .json({ success: false, message: "message not found", data: null });
     }
     const user = req.user;
     if (!message.senderId.equals(user._id)) {
-      return res
-        .json(403)
-        .json({ success: false, message: "User is not the sender of message", data : null });
+      return res.json(403).json({
+        success: false,
+        message: "User is not the sender of message",
+        data: null,
+      });
     }
 
     if (message.isDeleted) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Message is deleted already", data : null });
+      return res.status(400).json({
+        success: false,
+        message: "Message is deleted already",
+        data: null,
+      });
     }
 
     message.text = editedText;
     message.isEdited = true;
     await message.save();
 
-    return res
-      .status(201)
-      .json({ success: true, message: "message edited successfully", data : message });
+    return res.status(201).json({
+      success: true,
+      message: "message edited successfully",
+      data: message,
+    });
   }
 );
 
@@ -188,22 +205,26 @@ export const deleteMessage = asyncHandler<IGetUserAuthInfoRequest>(
     if (!message) {
       return res
         .status(404)
-        .json({ success: false, message: "message not found" , data : null });
+        .json({ success: false, message: "message not found", data: null });
     }
     const user = req.user;
     if (!message.senderId.equals(user._id)) {
-      return res
-        .status(403)
-        .json({ success: false, message: "User is not the sender of message" , data : null });
+      return res.status(403).json({
+        success: false,
+        message: "User is not the sender of message",
+        data: null,
+      });
     }
 
     message.text = "";
     message.isDeleted = true;
     await message.save();
 
-    return res
-      .status(201)
-      .json({ success: true, message: "message deleted successfully" , data : message });
+    return res.status(201).json({
+      success: true,
+      message: "message deleted successfully",
+      data: message,
+    });
   }
 );
 

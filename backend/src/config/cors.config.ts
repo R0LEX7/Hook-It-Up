@@ -2,8 +2,13 @@ export const corsConfig = () => {
   const allowedOrigins = [
     "http://localhost:8081",
     "http://192.168.1.6:8081",
-    "https://your-frontend.com",
+    "https://b_cilga-anonymous-8081.exp.direct",
   ];
+  // const allowedOrigins = [
+  //   "http://localhost:8081",
+  //   "http://192.168.1.6:8081",
+  //   "https://your-frontend.com",
+  // ];
 
   const corsOptions = {
     origin: function (

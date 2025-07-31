@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { connectToDatabase, corsConfig, initializeSocket } from "./config";
 import express, { NextFunction, Request, Response } from "express";
-import { Server } from "socket.io"
+import { Server } from "socket.io";
 import { createServer } from "http";
 import {
   profileRouter,
@@ -25,9 +25,6 @@ const server = createServer(app);
 //initializing sockets here
 initializeSocket(server);
 
-
-
-
 app.use(cors(corsConfig()));
 app.options("*", cors(corsConfig()));
 app.use(express.json());
@@ -49,9 +46,10 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     res.status(400).json({ error: "Validation Error", details: err.errors });
     console.log("Error : ", err.errors);
     return;
+  } else {
+    console.log("Error : ", err);
+    res.status(500).json({ error: "Something went wrong!!" });
   }
-  console.log("Error : ", err);
-  res.status(500).json({ error: "Something went wrong!!" });
 });
 
 server.listen(PORT, () => {
