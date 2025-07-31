@@ -27,7 +27,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface IProps {
@@ -163,7 +163,7 @@ const Register = ({ user }: IProps) => {
       <StatusBar style="dark" />
 
       <KeyboardAvoidingView
-        style={{ alignItems: 'center', height: 100, marginTop: 23, flex: 1 }}
+        style={{ alignItems: 'center', height: 100, marginTop: 2, flex: 1 }}
         behavior="padding"
         keyboardVerticalOffset={0}
       >
@@ -178,27 +178,52 @@ const Register = ({ user }: IProps) => {
             }}
           />
         )}
+        <View
+          style={{
+            width: wp(100),
+            borderBottomWidth: 1,
+            borderBottomColor: SECONDARY,
+            height: wp(13),
+
+          }}
+        >
+          <BackButton />
+          <View
+            className="rounded-full"
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              gap: 16,
+              alignItems: 'center',
+              width: wp(98),
+              justifyContent: 'center',
+              paddingBottom: 13,
+            }}
+          >
+
+            <View className=" py-1">
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  color: PRIMARY,
+                  textAlign: 'center',
+                  fontFamily: FONT.semiBold,
+                }}
+              >
+                Edit Your Profile
+              </Text>
+
+            </View>
+          </View>
+        </View>
         <ScrollView
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 10 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           className="relative"
         >
-          <BackButton />
-          <View style={{ alignItems: 'center' }} className="mb-4">
-            <Text
-              style={{
-                fontSize: 17,
-                fontWeight: 'bold',
-                marginTop: 25,
-                color: PRIMARY,
-                fontFamily: FONT.semiBold,
-              }}
-            >
-              Edit your Profile
-            </Text>
-          </View>
-          <View className="rounded-full mb-4 items-center">
+          <View className="rounded-full items-center" style={{marginBlock : 10}}>
             <Image
               source={{ uri: image || dummyPfp }}
               style={{ height: hp(6), width: hp(6) }}

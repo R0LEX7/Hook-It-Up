@@ -1,3 +1,5 @@
-import ProfileScreen from '@/screens/ProfileScreen';
+import ChatRoomScreen from '@/screens/ChatRoomScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
-export { ProfileScreen, EditProfileScreen };
+import ProfileScreen from '@/screens/ProfileScreen';
+
+export { ChatRoomScreen, EditProfileScreen, ProfileScreen };

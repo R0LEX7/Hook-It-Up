@@ -1,13 +1,13 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { Pressable } from 'react-native';
 
 const BackButton = () => {
   const router = useRouter();
   return (
-    <TouchableOpacity
-      className=" p-4 flex items-center justify-center absolute left-1"
+    <Pressable
+      className=" px-4 pt-1 flex items-center justify-center absolute left-1"
 
       onPress={() => router.back()}
     >
@@ -17,7 +17,7 @@ const BackButton = () => {
         size={30}
         color="black"
       />
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
