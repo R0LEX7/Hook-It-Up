@@ -24,9 +24,7 @@ const useUser = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         )();
-        console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-        console.log('user hook called');
-        console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+        console.log(' profile user -> ', res.data);
 
         if (res?.data?.user) {
           setUser(res.data.user);

@@ -1,3 +1,4 @@
+import { IMessage } from '@/interfaces/message.interface';
 import { IChat } from './../interfaces/chat.interface';
 import { IUser } from '@/interfaces/user.interface';
 
@@ -155,6 +156,23 @@ export const dummyChatData :IChat[] =
         "messageType": "text",
         "isDeleted": true
       }
+    }
+  ]
+
+  export const dummyMessages : IMessage[] =  [
+    {
+      "_id": "68832d675c908659ec075de3",
+      "text": "hello!!",
+      "senderId": {
+        "_id": "6857d38ef666789950a9a57c",
+        "username": "liam_brown01",
+        "profilePic": "https://res.cloudinary.com/dtrawqhte/image/upload/v1750949939/HookItUp/qrzigi5lyowqegu9omxk.jpg"
+      },
+      "messageType": "text",
+      "isSeen": true,
+      "isEdited": true,
+      "isDeleted": true,
+      "createdAt": "2025-07-25T07:08:23.916Z"
     }
   ]
 

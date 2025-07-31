@@ -23,7 +23,11 @@ import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const android = Platform.OS === 'android';
 
-const searchData = (text: string, chatList: IChat[], userId: string): IChat[] => {
+const searchData = (
+  text: string,
+  chatList: IChat[],
+  userId: string,
+): IChat[] => {
   const searchText = text.trim().toLowerCase();
 
   return chatList.filter((chat) => {
@@ -37,14 +41,13 @@ const searchData = (text: string, chatList: IChat[], userId: string): IChat[] =>
   });
 };
 
-
 const Index = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [availableUsersToChat, setAvailableUsersToChat] = useState<IUser[]>([]);
   const [chats, setChats] = useState<IChat[]>([]);
   const [filteredChats, setFilteredChats] = useState<IChat[]>([]);
 
-  const {user} = useUserStore();
+  const { user } = useUserStore();
 
 
   useEffect(() => {
@@ -84,7 +87,7 @@ const Index = () => {
     fetchData();
   }, []);
 
-  if(!user){
+  if (!user) {
     return null;
   }
   const Reusable: React.FC<{ message: string }> = ({ message }) => (
@@ -133,10 +136,9 @@ const Index = () => {
                 style={{ fontSize: hp(1.7), fontFamily: FONT.medium }}
                 className="flex-1 text-base mb-1 pl-1 tracking-widest"
                 onChangeText={(text) => {
-                  const filteredData = searchData(text , chats , user._id);
-                  console.log("query " , text , "filteredUser " , filteredData);
+                  const filteredData = searchData(text, chats, user._id);
+                  console.log('query ', text, 'filteredUser ', filteredData);
                   setFilteredChats(filteredData);
-
                 }}
               />
               <View>
@@ -165,9 +167,7 @@ const Index = () => {
                 renderItem={({ item }) => (
                   <MessageCard
                     chat={item}
-                    handleClick={() =>
-                      console.log('chatroom id clicked', item._id)
-                    }
+
                   />
                 )}
               />

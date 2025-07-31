@@ -4,17 +4,18 @@ import { IChat } from '@/interfaces/chat.interface';
 import { IUser } from '@/interfaces/user.interface';
 import { useUserStore } from '@/store/user.store';
 import { formatMessageTime } from '@/utils/formateDate.utils';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 interface IProps {
   chat: IChat;
-  handleClick: () => void;
 }
 
-const MessageCard = ({ chat, handleClick }: IProps) => {
+const MessageCard = ({ chat }: IProps) => {
   const { user } = useUserStore();
+  const router = useRouter();
 
   const otherUser = chat.members.find(
     (member: IUser) => member._id !== user?._id,
@@ -26,8 +27,19 @@ const MessageCard = ({ chat, handleClick }: IProps) => {
 
   console.log(chat.lastMessage);
 
+  const handleClick = () =>
+    router.push({
+      pathname: '/(tabs)/chat/[chatRoomId]',
+      params: {
+        chatRoomId: chat._id,
+        username: otherUser.username,
+        profilePic: otherUser.profilePic,
+        fullName: otherUser.firstName + ' ' + otherUser.lastName,
+      },
+    });
+
   return (
-    <TouchableOpacity
+    <Pressable
       className="w-full py-3 items-center flex-row border-b border-neutral-300"
       onPress={handleClick}
     >
@@ -82,12 +94,14 @@ const MessageCard = ({ chat, handleClick }: IProps) => {
                 ? 'This message was deleted'
                 : chat.lastMessage.messageType === 'text' &&
                     chat.lastMessage.text
-                  ? chat.lastMessage.text.slice(0, 45) + '...'
+                  ? chat.lastMessage.text.length > 45
+                    ? chat.lastMessage.text.slice(0, 45) + '...'
+                    : chat.lastMessage.text
                   : '📷 Media'}
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
