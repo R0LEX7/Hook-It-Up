@@ -17,7 +17,7 @@ const router: Router = express.Router();
 router.get("/all/:chatRoomId" , isAuthenticated , validate(getMessagesSchema, RequestPart.PARAMS), getMessages);
 router.post("/send" , isAuthenticated ,validate(sendMessageSchema), sendMessage);
 router.put("/edit" , isAuthenticated ,validate(editMessageSchema), editMessage);
-router.put("/seen" , isAuthenticated ,validate(deleteMessageSchema), seenMessage);
-router.delete("/delete" , isAuthenticated ,validate(deleteMessageSchema), deleteMessage);
+router.put("/seen" , isAuthenticated ,validate(getMessagesSchema), seenMessage);
+router.delete("/delete/:messageId" , isAuthenticated ,validate(deleteMessageSchema , RequestPart.PARAMS), deleteMessage);
 
 export default router

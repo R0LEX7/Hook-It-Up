@@ -6,6 +6,7 @@ import { UserModal } from "../models/user.model";
 import { messageModel } from "../models/message.model.";
 import { IMessage } from "../Interfaces/message.interface";
 import { IChat } from "../Interfaces/chat.interface";
+import { handleMessageSend } from "../services/message";
 
 /**
  * APIS
@@ -79,80 +80,15 @@ export const getMessages = asyncHandler<IGetUserAuthInfoRequest>(
 
 export const sendMessage = asyncHandler<IGetUserAuthInfoRequest>(
   async (req, res: Response) => {
-    const { chatRoomId, senderId, messageType } = req.body;
-
-    const isChatroomExists: IChat | null = await chatModel.findById(chatRoomId);
-
-    if (!isChatroomExists) {
-      return res.status(404).json({
-        success: false,
-        message: "Chat room isn't exist",
-      });
-    }
-
-    isUserInChatroom(req.user, res, isChatroomExists);
-
-    const isSenderExists = await UserModal.findById(senderId);
-
-    if (!isSenderExists) {
-      return res
-        .status(404)
-        .json({ success: false, message: "sender not exists" });
-    }
-
-    const user = req.user;
-
-    if (messageType === "text" && !req.body.text?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Text can't be empty",
-        data: null,
-      });
-    }
-
-    if (
-      (messageType === "image" || messageType === "file") &&
-      !req.body.mediaUrl
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: `${messageType} mediaUrl can't be empty`,
-        data: null,
-      });
-    }
-
-    const messageBody =
-      messageType === "text"
-        ? { text: req.body.text }
-        : { mediaUrl: req.body.mediaUrl };
-
-    console.log(messageBody);
-
-    const receiverId = isChatroomExists.members.find(
-      (id) => id.toString() !== senderId.toString()
-    );
-
-    const message = new messageModel({
-      chatRoom: chatRoomId,
-      receiverId,
-
-      messageType,
-      ...messageBody,
-      senderId: user._id,
+    const response = await handleMessageSend({
+      chatRoomId: req.body.chatRoomId,
+      senderId: req.body.senderId,
+      messageType: req.body.messageType,
+      text: req.body.text,
+      mediaUrl: req.body.mediaUrl,
     });
 
-    await message.save();
-
-    isChatroomExists.lastMessage = message._id;
-
-    isChatroomExists.lastMessageAt = new Date();
-
-    await isChatroomExists.save();
-    return res.status(201).json({
-      success: true,
-      message: "Message send successfully",
-      data: message,
-    });
+    return res.status(response.success ? 201 : 400).json(response);
   }
 );
 
@@ -160,7 +96,10 @@ export const editMessage = asyncHandler<IGetUserAuthInfoRequest>(
   async (req, res: Response) => {
     const { messageId, editedText } = req.body;
 
-    const message: IMessage | null = await messageModel.findById(messageId);
+    const message = await messageModel
+      .findById(messageId)
+      .populate("senderId", "username profilePic _id")
+      .populate("receiverId", "username profilePic _id");
 
     if (!message) {
       return res
@@ -198,9 +137,13 @@ export const editMessage = asyncHandler<IGetUserAuthInfoRequest>(
 
 export const deleteMessage = asyncHandler<IGetUserAuthInfoRequest>(
   async (req, res: Response) => {
-    const { messageId } = req.body;
+    const { messageId } = req.params;
+    console.log("deleting id ", messageId);
 
-    const message: IMessage | null = await messageModel.findById(messageId);
+    const message = await messageModel
+      .findById(messageId)
+      .populate("senderId", "username profilePic _id")
+      .populate("receiverId", "username profilePic _id");
 
     if (!message) {
       return res
@@ -220,6 +163,8 @@ export const deleteMessage = asyncHandler<IGetUserAuthInfoRequest>(
     message.isDeleted = true;
     await message.save();
 
+    console.log("deleted message ", message);
+
     return res.status(201).json({
       success: true,
       message: "message deleted successfully",
@@ -230,28 +175,35 @@ export const deleteMessage = asyncHandler<IGetUserAuthInfoRequest>(
 
 export const seenMessage = asyncHandler<IGetUserAuthInfoRequest>(
   async (req, res: Response) => {
-    const { messageId } = req.body;
+    const { chatRoomId } = req.body;
 
-    const message: IMessage | null = await messageModel.findById(messageId);
+    const chatRoom: IChat | null = await chatModel.findById(chatRoomId);
 
-    if (!message) {
+    if (!chatRoom) {
       return res
         .status(404)
-        .json({ success: false, message: "message not found" });
+        .json({ success: false, message: "chat room not found" });
     }
     const user = req.user;
-    if (!message.receiverId.equals(user._id)) {
+
+    if (!chatRoom?.members.includes(user._id)) {
       return res.status(403).json({
         success: false,
         message: "User is not the receiver of message",
       });
     }
 
-    message.isSeen = true;
-    await message.save();
+    await messageModel.updateMany(
+      {
+        chatRoom: chatRoomId,
+        receiverId: user._id,
+        isSeen: false,
+      },
+      { isSeen: true }
+    );
 
     return res
-      .status(201)
-      .json({ success: true, message: "message seen successfully" });
+      .status(200)
+      .json({ success: true, message: "Messages marked as seen" });
   }
 );

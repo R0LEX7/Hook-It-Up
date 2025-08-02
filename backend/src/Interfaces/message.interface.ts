@@ -14,3 +14,12 @@ export interface IMessage extends Document {
   isDeleted: Boolean;
   [key: string]: any; // index signature
 }
+export type ImessageType = 'text' | 'image' | 'video';
+
+export interface IMessageDataToBeRecieved {
+  chatRoomId: string;
+  senderId: string;
+  text?: string;
+  mediaUrl?: string;
+  messageType: ImessageType;
+}
