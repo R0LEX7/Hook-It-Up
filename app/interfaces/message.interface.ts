@@ -20,3 +20,13 @@ export interface IMessage {
   isDeleted: boolean;
   [key: string]: any; // index signature
 }
+
+export type ImessageType = 'text' | 'image' | 'video';
+
+export interface IMessageDataToBeSent {
+  chatRoomId: string;
+  senderId: string;
+  text?: string;
+  mediaUrl?: string;
+  messageType: ImessageType;
+}

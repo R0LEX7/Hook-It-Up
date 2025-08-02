@@ -10,13 +10,26 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 const fetchData = withErrorHandler(async (id) => {
-  const token = await getData("user_token");
+  const token = await getData('user_token');
 
   const response = await axios.get(BASE_URI + `message/all/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response;
 });
+const seenMessagesHelper = withErrorHandler(async (id) => {
+  const token = await getData('user_token');
+
+  const response = await axios.put(
+    BASE_URI + `message/seen`,
+    { chatRoomId: id },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  return response;
+});
+
 
 const toStr = (val: string | string[] | undefined): string => {
   if (Array.isArray(val)) return val[0] ?? '';
@@ -24,45 +37,53 @@ const toStr = (val: string | string[] | undefined): string => {
 };
 
 export default function Index() {
-
-  const { chatRoomId ,username , fullName , profilePic } = useLocalSearchParams();
-  const [loading , setLoading] = useState<boolean>(false);
-    const [messages, setMessages] = useState<IMessage[]>([]);
-
+  const { chatRoomId, username, fullName, profilePic } = useLocalSearchParams();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [messages, setMessages] = useState<IMessage[]>([]);
 
   useEffect(() => {
-   if (!chatRoomId) return;
+    if (!chatRoomId) return;
 
     const loadMessages = async () => {
       setLoading(true);
       try {
         const res = await fetchData(chatRoomId);
-        console.log(res.status);
         if (res?.status === 200 || res?.status === 201) {
           setMessages(res.data?.data || []);
-          console.table(res.data.data)
+          console.table(res.data.data);
+
+          // sending seen request
+          await seenMessagesHelper(chatRoomId);
         }
       } catch (err) {
         console.log('Error fetching messages:', err);
-        getToast("error" , "Error fetching messages")
+        getToast('error', 'Error fetching messages');
       } finally {
         setLoading(false);
       }
     };
 
     loadMessages();
-  } , [chatRoomId])
-
+  }, [chatRoomId]);
 
   const participantData = {
-  username: toStr(username),
-  fullName: toStr(fullName),
-  profilePic: toStr(profilePic),
-};
+    username: toStr(username),
+    fullName: toStr(fullName),
+    profilePic: toStr(profilePic),
+  };
 
   return (
     <>
-    {loading ? (<Loader/>) : (<ChatRoomScreen chatRoomId={toStr(chatRoomId)} messages={messages} participantData={participantData} />)}
+      {loading ? (
+        <Loader />
+      ) : (
+        <ChatRoomScreen
+          chatRoomId={toStr(chatRoomId)}
+          messages={messages}
+          participantData={participantData}
+          setMessages={setMessages}
+        />
+      )}
     </>
   );
 }

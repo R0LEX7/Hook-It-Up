@@ -3,41 +3,47 @@ import MessageBox from '@/components/MessageBox';
 import { BASE_URI } from '@/constants/api';
 import { FONT } from '@/constants/fonts.constant';
 import { PRIMARY, SECONDARY } from '@/constants/myColor';
-import { IMessage } from '@/interfaces/message.interface';
+import { IMessage, IMessageDataToBeSent } from '@/interfaces/message.interface';
 import { withErrorHandler } from '@/libs';
 import { getData } from '@/libs/asyncStorage.libs';
 import { uploadToCloudinary } from '@/libs/cloudinary';
+import { socket } from '@/libs/socket.libs';
 import { getToast } from '@/libs/Toast.libs';
 import { sendMessageSchema } from '@/schemas/messageSchema';
+import { handleSendMessageService } from '@/services/message.service';
 import { useUserStore } from '@/store/user.store';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import {
-    heightPercentageToDP as hp,
-    widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface IParticipantData {
   username: string;
   profilePic: string;
   fullName: string;
+}
+interface IResponse {
+  data: IMessage;
+  success: boolean;
+  message: string;
 }
 
 type ImessageType = 'text' | 'image' | 'video';
@@ -46,24 +52,87 @@ interface IProps {
   messages: IMessage[];
   participantData: IParticipantData;
   chatRoomId: string;
+  setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>;
 }
 
-interface IDataToBeSent {
-  chatRoomId: string;
-  senderId: string;
-  text?: string;
-  mediaUrl?: string;
-  messageType: ImessageType;
-}
+const editMessageHelper = withErrorHandler(
+  async (editedMessage: string, messageId: string) => {
+    const token = await getData('user_token');
 
-const ChatRoomScreen = ({ messages, participantData, chatRoomId }: IProps) => {
+    const response = await axios.put(
+      BASE_URI + `message/edit`,
+      { messageId: messageId, editedText: editedMessage },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    return response;
+  },
+);
+
+const deleteMessageHelper = withErrorHandler(async (messageId: string) => {
+  const token = await getData('user_token');
+
+  const response = await axios.delete(
+    BASE_URI + `message/delete/${messageId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+  return response;
+});
+
+const ChatRoomScreen = ({
+  messages,
+  participantData,
+  chatRoomId,
+  setMessages,
+}: IProps) => {
   const { user } = useUserStore();
 
   const [messageInput, setMessageInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<string>('');
+  const [IsEditing, setIsEditing] = useState<boolean>(false);
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.emit('join_chat_room', chatRoomId);
+
+    socket.on('disconnect', () => {
+      console.log('⚠️ Socket disconnected');
+    });
+
+    return () => {
+      socket.disconnect(); // Cleanup on screen unmount
+    };
+  }, [chatRoomId]);
+
+  useEffect(() => {
+    const handler = (res: IResponse) => {
+      if (res.success && res.data) {
+        setMessages((prev) => [...prev, res.data]);
+      } else {
+        getToast('error', res.message || 'Failed to receive message.');
+      }
+    };
+
+    socket.on('new_message', handler);
+
+    return () => {
+      socket.off('new_message', handler);
+    };
+  }, [setMessages]);
+
   if (!user) return null;
 
+  // function which sends message
   const handleMessageSent = async (
     messageType: ImessageType = 'text',
     mediaData?: string,
@@ -75,7 +144,7 @@ const ChatRoomScreen = ({ messages, participantData, chatRoomId }: IProps) => {
       return;
 
     setLoading(true);
-    let dataToBeSent: IDataToBeSent;
+    let dataToBeSent: IMessageDataToBeSent;
 
     if (messageType === 'text') {
       dataToBeSent = {
@@ -94,7 +163,6 @@ const ChatRoomScreen = ({ messages, participantData, chatRoomId }: IProps) => {
         mediaUrl: uploadedImageUrl,
       };
     }
-
     const validation = sendMessageSchema.safeParse(dataToBeSent);
     if (!validation.success) {
       const fieldErrors = validation.error.flatten().fieldErrors;
@@ -107,29 +175,67 @@ const ChatRoomScreen = ({ messages, participantData, chatRoomId }: IProps) => {
       return;
     }
 
-    const token = await getData('user_token');
-    const messageResponse = await withErrorHandler(async () => {
-      return await axios.post(BASE_URI + 'message/send', dataToBeSent, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    })();
+    const socketRes = await handleSendMessageService(dataToBeSent, socket);
 
-    if (messageResponse?.status !== 201) {
-      const errorMsg =
-        messageResponse?.data?.message ||
-        'Message send failed. Please try again.';
-      getToast('error', 'Message send failed', errorMsg);
-      return;
-    }
-
-    console.log(dataToBeSent, messageResponse.data);
+    console.log(dataToBeSent);
     setLoading(false);
     setMessageInput('');
     setImage(''); // reset the image after sending
   };
 
+  // function which edit message
+  const handleMessageEdit = async () => {
+    setLoading(true);
+    try {
+      if (IsEditing && selectedMessageId) {
+        const res = await editMessageHelper(messageInput, selectedMessageId);
+        if (res.status === 200 || res.status === 201) {
+          const updated = res.data.data;
+
+          setMessages((prev) =>
+            prev.map((msg) => (msg._id === updated._id ? updated : msg)),
+          );
+
+          setIsEditing(false);
+          setSelectedMessageId(null);
+          setMessageInput('');
+        }
+      }
+    } catch (error) {
+      console.error('Error Editing message:', error);
+      getToast(
+        'error',
+        'Editing message Failed',
+        'An unexpected error occurred.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // delete message function
+  const handleDelete = async (messageId: string) => {
+    console.log('selectedMessageId ', messageId);
+    if (messageId) {
+      try {
+        const res = await deleteMessageHelper(messageId);
+        setLoading(true);
+        if (res?.status === 200 || res?.status === 201) {
+          const deleted = res.data.data;
+          setMessages((prev) =>
+            prev.map((msg) => (msg._id === deleted._id ? deleted : msg)),
+          );
+          console.log(res.data.data);
+        }
+      } catch (err) {
+        console.log('Error in deleting message:', err);
+        getToast('error', 'Error in deleting message:');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+  // function to pick image
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -237,7 +343,14 @@ const ChatRoomScreen = ({ messages, participantData, chatRoomId }: IProps) => {
             keyExtractor={(item) => item._id}
             contentContainerStyle={{ paddingVertical: 10 }}
             renderItem={({ item }) => (
-              <MessageBox key={item._id} message={item} />
+              <MessageBox
+                key={item._id}
+                message={item}
+                setIsEditing={setIsEditing}
+                setSelectedMessageId={setSelectedMessageId}
+                setMessageInput={setMessageInput}
+                handleDelete={handleDelete}
+              />
             )}
             style={{ flex: 1 }}
             showsVerticalScrollIndicator={false}
@@ -245,6 +358,23 @@ const ChatRoomScreen = ({ messages, participantData, chatRoomId }: IProps) => {
           />
 
           {/* Input Bar */}
+          {IsEditing && (
+            <View style={{ paddingTop: 8, paddingHorizontal: 8 }}>
+              <Text style={{ color: 'gray', fontFamily: FONT.medium }}>
+                Editing message........{' '}
+                <Text
+                  style={{ color: 'red' }}
+                  onPress={() => {
+                    setIsEditing(false);
+                    setSelectedMessageId(null);
+                    setMessageInput('');
+                  }}
+                >
+                  Cancel
+                </Text>
+              </Text>
+            </View>
+          )}
           <View className="flex-row justify-between items-center w-full px-2 py-3 bg-white">
             <View className="flex-row items-center rounded-2xl bg-neutral-200 px-3 py-2 flex-1">
               <TextInput
@@ -278,7 +408,10 @@ const ChatRoomScreen = ({ messages, participantData, chatRoomId }: IProps) => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
-              onPress={() => handleMessageSent('text')}
+              onPress={() => {
+                if (IsEditing) handleMessageEdit();
+                else handleMessageSent('text');
+              }}
             >
               {loading ? (
                 <ActivityIndicator size={28} color={'white'} />
